@@ -1,40 +1,71 @@
-name: Download and Chunk Drive File
+name: Split Push Large Files
+
+on:
+  workflow_dispatch:
 
 permissions:
   contents: write
 
-on:
-  workflow_dispatch:
-    inputs:
-      drive_link:
-        description: "Google Drive link"
-        required: true
-
-
 jobs:
-  download:
+  upload-chunks:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Install gdown
-        run: pip install gdown
-
-      - name: Download file
+      - name: Configure Git identity
         run: |
-          gdown "${{ github.event.inputs.drive_link }}" -O file.bin
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config http.postBuffer 524288000
+          git config http.maxRequestBuffer 200M
 
-      - name: Split file
+      - name: List local chunk files
+        run: ls -lh part_* || echo "No local chunk files found"
+
+      - name: Stage and push chunks in batches
         run: |
-          split -b 90M file.bin part_
+          set -e
+          batch_size=30
+          counter=0
+          total=$(ls part_* | wc -l)
+          echo "Total chunk files: $total"
 
-      - name: Commit parts
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
+          # make sure latest remote info is fetched
+          git fetch origin main || git fetch origin master || true
 
-          git add part_*
-          git commit -m "upload chunks"
-          git push
+          for file in part_*; do
+            # اگر فایل قبلاً در ریموت هست، skip کن
+            if git ls-tree -r origin/main --name-only | grep -qx "$file"; then
+              echo "Skip already uploaded: $file"
+              continue
+            fi
+
+            git add "$file"
+            counter=$((counter+1))
+
+            # هر batch_size فایل یک‌بار commit و push کن
+            if [ $counter -ge $batch_size ]; then
+              git commit -m "Add $counter chunks batch"
+              echo "Pushing $counter chunks..."
+              if git push origin HEAD; then
+                echo "Push succeeded."
+              else
+                echo "Push failed, stopping for resume."
+                exit 1
+              fi
+              counter=0
+            fi
+          done
+
+          # اگر فایل‌هایی ماندند که هنوز push نشده‌اند
+          pending=$(git diff --cached --name-only)
+          if [ -n "$pending" ]; then
+            git commit -m "Final batch"
+            echo "Pushing final batch..."
+            git push origin HEAD || echo "Final push failed; will resume next run."
+          else
+            echo "No pending chunks; everything uploaded."
+          fi
