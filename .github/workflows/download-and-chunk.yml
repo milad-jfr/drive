@@ -1,11 +1,15 @@
 name: Download and Chunk Drive File
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
       drive_link:
         description: "Google Drive link"
         required: true
+
 
 jobs:
   download:
