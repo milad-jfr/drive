@@ -1,0 +1,19 @@
+name: Test S3 Connectivity
+
+on:
+  workflow_dispatch:
+
+jobs:
+  connectivity-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test connection to S3 endpoint
+        run: |
+          echo "Testing connection to https://c133027.parspack.net ..."
+          if curl -I --max-time 10 https://c133027.parspack.net; then
+            echo "SUCCESS: Connected to endpoint."
+          else
+            echo "FAILED: Unable to connect to endpoint."
+            exit 1
+          fi
