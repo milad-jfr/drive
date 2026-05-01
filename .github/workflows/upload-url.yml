@@ -1,0 +1,92 @@
+name: Drive Chunk Upload (Range Download)
+
+on:
+  workflow_dispatch:
+    inputs:
+      drive_url:
+        description: "Direct downloadable link to Google Drive file"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  upload-chunk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ------------------ READ STATE ------------------
+      - name: Read upload state
+        id: st
+        run: |
+          if [ -f .upload_state ]; then
+            source .upload_state
+          else
+            NEXT_PART=0
+          fi
+          echo "next=$NEXT_PART" >> $GITHUB_OUTPUT
+
+      # ------------------ DOWNLOAD ONE CHUNK ------------------
+      - name: Download chunk using Range
+        id: dl
+        run: |
+          PART=${{ steps.st.outputs.next }}
+          CHUNK_SIZE=$((50 * 1024 * 1024))     # 50 MB
+          START=$((PART * CHUNK_SIZE))
+          END=$((START + CHUNK_SIZE - 1))
+
+          echo "Downloading part $PART (bytes $START-$END)"
+
+          curl -L \
+            -H "Range: bytes=$START-$END" \
+            "${{ github.event.inputs.drive_url }}" \
+            -o "chunk_${PART}.bin"
+
+          if [ ! -s "chunk_${PART}.bin" ]; then
+            echo "Chunk is empty. Probably end of file reached."
+            echo "stop=true" >> $GITHUB_OUTPUT
+          else
+            echo "stop=false" >> $GITHUB_OUTPUT
+          fi
+
+      # ------------------ STOP IF NO MORE DATA ------------------
+      - name: No more chunks
+        if: steps.dl.outputs.stop == 'true'
+        run: |
+          echo "All chunks processed. Job finished."
+          exit 0
+
+      # ------------------ COMMIT + PUSH ------------------
+      - name: Commit and push
+        run: |
+          PART=${{ steps.st.outputs.next }}
+
+          git add "chunk_${PART}.bin"
+          git commit -m "Upload chunk $PART"
+          
+          echo "Waiting 30 seconds before push (GitHub safety delay)..."
+          sleep 30
+
+          git push origin HEAD
+
+      # ------------------ UPDATE STATE ------------------
+      - name: Update session state
+        run: |
+          PART=${{ steps.st.outputs.next }}
+          NEXT=$((PART + 1))
+          echo "NEXT_PART=$NEXT" > .upload_state
+
+          git add .upload_state
+          git commit -m "Update state: next part = $NEXT"
+          git push origin HEAD
