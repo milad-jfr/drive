@@ -1,6 +1,5 @@
 ### COMMAND
-mega-login j.milad@gmail.com mm1mmsMAWERTY&
-
+mega-get 'https://mega.nz/file/DJdCBahI#QKwCMIwZEv0GxNM4F7BbN5ambcIQoGfF99CcoR4RdaU' /home/USER/Downloads
 ### END
 
 
