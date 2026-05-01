@@ -1,4 +1,4 @@
-name: Smart Persistent Worker
+name: Persistent Command Worker
 
 on:
   workflow_dispatch:
@@ -12,51 +12,57 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Setup Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "actions@users.noreply.github.com"
 
-      - name: Worker Loop
+      - name: Setup git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Start Worker
         shell: bash
         run: |
+
           COMMAND_FILE="command.txt"
           HISTORY_FILE=".executed_commands.log"
+
           touch "$HISTORY_FILE"
-          
-          echo "Worker started. Monitoring $COMMAND_FILE..."
 
-          while true; do
-            # دریافت آخرین تغییرات از ریپو
-            git pull --rebase origin main || true
-            
-            # خواندن خط به خط فایل دستورات
+          echo "Worker started..."
+
+          while true
+          do
+
+            # دریافت آخرین نسخه repo بدون مشکل merge
+            git fetch origin main
+            git reset --hard origin/main
+
             if [ -f "$COMMAND_FILE" ]; then
-              while IFS= read -r line || [[ -n "$line" ]]; do
-                # حذف فضای خالی ابتدا و انتها
-                line=$(echo "$line" | xargs)
-                [[ -z "$line" ]] && continue
-                [[ "$line" == "#"* ]] && continue # صرف نظر از کامنت‌ها
 
-                # تولید هش از دستور برای شناسایی یکتایی
-                cmd_hash=$(echo -n "$line" | sha256sum | cut -d' ' -f1)
+              awk '/### COMMAND/{flag=1;next}/### END/{flag=0}flag' "$COMMAND_FILE" | awk 'BEGIN{RS="";FS="\n"}{print}' | while read -r block
+              do
 
-                # اگر دستور قبلاً اجرا نشده باشد
-                if ! grep -q "$cmd_hash" "$HISTORY_FILE"; then
-                  echo ">>> اجرای دستور جدید: $line"
-                  
-                  # اجرای دستور
-                  bash -c "$line" || echo "دستور با خطا مواجه شد."
-                  
-                  # ثبت در تاریخچه
-                  echo "$cmd_hash" >> "$HISTORY_FILE"
+                hash=$(echo "$block" | sha256sum | cut -d" " -f1)
+
+                if ! grep -q "$hash" "$HISTORY_FILE"; then
+
+                  echo "========== NEW COMMAND =========="
+                  echo "$block"
+                  echo "================================="
+
+                  bash -c "$block" || echo "Command failed"
+
+                  echo "$hash" >> "$HISTORY_FILE"
+
                   git add "$HISTORY_FILE"
-                  git commit -m "Marked command as executed: $cmd_hash" || true
+                  git commit -m "executed command $hash" || true
                   git push origin main || true
+
                 fi
-              done < "$COMMAND_FILE"
+
+              done
+
             fi
-            
-            sleep 30
+
+            sleep 20
+
           done
