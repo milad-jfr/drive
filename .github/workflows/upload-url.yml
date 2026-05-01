@@ -1,4 +1,4 @@
-name: Drive Chunk Upload
+name: Drive To Repo Chunked Uploader
 
 on:
   workflow_dispatch:
@@ -18,15 +18,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup git
+      - name: Setup git identity
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
 
-      - name: Read state
+      - name: Load upload state
         id: state
         run: |
           if [ -f .upload_state ]; then
@@ -34,87 +32,75 @@ jobs:
           else
             NEXT_PART=0
           fi
-          echo "part=$NEXT_PART" >> $GITHUB_OUTPUT
+          echo "next_part=$NEXT_PART" >> $GITHUB_OUTPUT
 
-      - name: Get download page
+      - name: First HTML request, get cookies
         run: |
           FILE_ID=${{ github.event.inputs.file_id }}
+          curl -s -c cookies.txt "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o page1.html
 
-          curl -L -s -c cookies.txt \
-          "https://drive.google.com/uc?export=download&id=${FILE_ID}" \
-          -o page.html
-
-      - name: Extract real download link
+      - name: Parse Drive HTML & Get real download link or confirm token
         id: link
         run: |
-
-          LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page.html | head -n1)
-
+          # تلاش برای پیدا کردن لینک واقعی دانلود
+          LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page1.html | head -n1)
           if [ -z "$LINK" ]; then
-            CONFIRM=$(grep -o 'confirm=[^&"]*' page.html | head -n1 | cut -d= -f2)
-
+            # اگر نبود، باید confirm token را بگیریم
+            CONFIRM=$(grep -o 'confirm=[^&"]*' page1.html | head -n1 | cut -d= -f2)
             FILE_ID=${{ github.event.inputs.file_id }}
-
-            curl -L -s -b cookies.txt -c cookies.txt \
-            "https://drive.google.com/uc?export=download&confirm=${CONFIRM}&id=${FILE_ID}" \
-            -o page2.html
-
+            curl -s -b cookies.txt -c cookies.txt \
+              "https://drive.google.com/uc?export=download&confirm=${CONFIRM}&id=${FILE_ID}" \
+              -o page2.html
             LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page2.html | head -n1)
           fi
+          if [ -z "$LINK" ]; then
+            echo "❌  Download link not found!"
+            exit 1
+          fi
+          echo "real_link=$LINK" >> $GITHUB_OUTPUT
 
-          echo "link=$LINK" >> $GITHUB_OUTPUT
-          echo "Download link found"
-
-      - name: Download chunk
-        id: download
+      - name: Download 50MB chunk (no -L!)
+        id: dl
         run: |
+          PART=${{ steps.state.outputs.next_part }}
+          CHUNK_SIZE=$((50*1024*1024))
+          START=$((PART*CHUNK_SIZE))
+          END=$((START+CHUNK_SIZE-1))
+          echo "Downloading chunk [$START-$END] (part $PART)"
 
-          PART=${{ steps.state.outputs.part }}
-
-          CHUNK=$((50*1024*1024))
-          START=$((PART*CHUNK))
-          END=$((START+CHUNK-1))
-
-          echo "Downloading chunk $PART ($START-$END)"
-
-          curl -L \
-          -b cookies.txt \
-          -H "Range: bytes=${START}-${END}" \
-          "${{ steps.link.outputs.link }}" \
-          -o chunk_${PART}.bin
-
-          SIZE=$(stat -c%s chunk_${PART}.bin)
-
-          echo "Chunk size $SIZE"
-
-          if [ "$SIZE" -lt 1000 ]; then
-            echo "stop=true" >> $GITHUB_OUTPUT
+          curl -s \
+            -b cookies.txt \
+            -H "Range: bytes=${START}-${END}" \
+            "${{ steps.link.outputs.real_link }}" \
+            -o chunk_${PART}.bin
+          
+          BYTES=$(stat -c%s chunk_${PART}.bin)
+          echo "chunk_bytes=$BYTES" >> $GITHUB_OUTPUT
+          # اگر سایز فایل کوچکتر از 1MB شد احتمالا تمام شده (یا مشکل)
+          if [ "$BYTES" -lt 1000000 ]; then
+            echo "finished=true" >> $GITHUB_OUTPUT
           else
-            echo "stop=false" >> $GITHUB_OUTPUT
+            echo "finished=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Stop if finished
-        if: steps.download.outputs.stop == 'true'
-        run: |
-          echo "Download finished"
+      - name: Stop if file finished
+        if: steps.dl.outputs.finished == 'true'
+        run: echo "File fully downloaded! Workflow finished."
 
-      - name: Commit chunk
-        if: steps.download.outputs.stop == 'false'
+      - name: Commit and push chunk
+        if: steps.dl.outputs.finished == 'false'
         run: |
-          PART=${{ steps.state.outputs.part }}
-
+          PART=${{ steps.state.outputs.next_part }}
           git add chunk_${PART}.bin
-          git commit -m "chunk $PART"
+          git commit -m "Upload chunk $PART"
           git push
 
-      - name: Update state
-        if: steps.download.outputs.stop == 'false'
+      - name: Advance upload state
+        if: steps.dl.outputs.finished == 'false'
         run: |
-          PART=${{ steps.state.outputs.part }}
+          PART=${{ steps.state.outputs.next_part }}
           NEXT=$((PART+1))
-
           echo "NEXT_PART=$NEXT" > .upload_state
-
           git add .upload_state
-          git commit -m "state $NEXT"
+          git commit -m "Update upload state, part $NEXT"
           git push
