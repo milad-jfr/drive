@@ -1,35 +1,72 @@
-name: Run Commands
+name: Smart Worker (Run Only on Update)
 
 on:
-  push:
-    paths:
-      - 'command.txt'
+  workflow_dispatch:
 
 jobs:
-  run-commands:
+  worker:
     runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Execute command blocks
+      - name: Setup git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Start Worker
         shell: bash
         run: |
 
           COMMAND_FILE="command.txt"
+          STATE_FILE=".last_command_hash"
 
-          echo "Running commands from $COMMAND_FILE"
+          touch "$STATE_FILE"
 
-          awk '/### COMMAND/{flag=1;next}/### END/{flag=0;print "###BLOCK_END###"}flag' "$COMMAND_FILE" \
-          | awk 'BEGIN{RS="###BLOCK_END###"}{print}' \
-          | while read -r block
+          echo "🚀 Worker started."
+
+          while true
           do
-            if [ -n "$block" ]; then
-              echo "===================="
-              echo "Executing:"
-              echo "$block"
-              echo "===================="
+            echo "🔄 Checking repository..."
+            git fetch origin main
+            git reset --hard origin/main
 
-              bash -c "$block" || echo "Command failed"
+            if [ -f "$COMMAND_FILE" ]; then
+              current_hash=$(sha256sum "$COMMAND_FILE" | cut -d" " -f1)
+              last_hash=$(cat "$STATE_FILE")
+
+              if [ "$current_hash" != "$last_hash" ]; then
+                echo "⚡ Command file changed, executing new content..."
+                echo "$current_hash" > "$STATE_FILE"
+
+                awk '/### COMMAND/{flag=1;next}/### END/{flag=0;print "###BLOCK_END###"}flag' "$COMMAND_FILE" \
+                | awk 'BEGIN{RS="###BLOCK_END###"}{print}' \
+                | while read -r block
+                do
+                  if [ -n "$block" ]; then
+                    echo "==============================="
+                    echo "🚧 Executing command block:"
+                    echo "$block"
+                    echo "==============================="
+                    bash -c "$block" || echo "⚠️ Command failed."
+                  fi
+                done
+
+                git add "$STATE_FILE"
+                git commit -m "Update command hash" || true
+                git push origin main || true
+              else
+                echo "🌀 No changes in command file. Skipping..."
+              fi
+
+            else
+              echo "⚠️ No command file found."
             fi
+
+            echo "✅ Sleeping 30 seconds..."
+            sleep 30
           done
