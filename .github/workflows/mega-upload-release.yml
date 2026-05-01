@@ -1,21 +1,7 @@
-name: Mega Download + Chunked Release Upload
+name: Mega Download + Chunked Release Upload (Fixed File)
 
 on:
   workflow_dispatch:
-    inputs:
-      mega_url:
-        description: "Mega.nz file link"
-        required: true
-        type: string
-      tag:
-        description: "Release tag (example: dataset-v1)"
-        required: true
-        type: string
-      chunk_size_gb:
-        description: "Chunk size in GB (max 2GB recommended)"
-        required: false
-        type: string
-        default: "2"
 
 permissions:
   contents: write
@@ -25,61 +11,68 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: Free Disk Space (Required for 12GB files)
+        run: |
+          echo "Freeing space..."
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+          df -h
+
       - name: Install dependencies (megacmd via .deb)
         run: |
           sudo apt update
           sudo apt install -y wget zip unzip
 
-          echo "--- Installing megacmd (via .deb) ---"
+          echo "--- Installing megacmd ---"
           wget https://mega.nz/linux/repo/xUbuntu_22.04/amd64/megacmd-xUbuntu_22.04_amd64.deb -O megacmd.deb
           sudo apt install -y ./megacmd.deb
+          rm -f megacmd.deb
 
-          echo "--- Installed tools ---"
           mega-cmd --version || true
           which mega-get || true
 
-      - name: Download file from Mega.nz
+      - name: Download fixed Mega file (ks_full_backup_2026.gz)
         run: |
           echo "Downloading file from Mega.nz..."
-          mega-get "${{ github.event.inputs.mega_url }}" ./ || (echo "Download failed"; exit 1)
+          mega-get "https://mega.nz/file/DJdCBahI#QKwCMIwZEv0GxNM4F7BbN5ambcIQoGfF99CcoR4RdaU" .
 
           echo "Downloaded files:"
           ls -lh
 
-      - name: Detect downloaded file
-        id: detect_file
-        run: |
-          FILE=$(ls -1t | head -n 1)
-          echo "file_name=$FILE" >> "$GITHUB_ENV"
-          echo "Detected file: $FILE"
+          if [ ! -f "ks_full_backup_2026.gz" ]; then
+            echo "ERROR: File ks_full_backup_2026.gz not found!"
+            exit 1
+          fi
 
-      - name: Split into chunks
+      - name: Split file into 2GB chunks
         run: |
-          SIZE_GB=${{ github.event.inputs.chunk_size_gb }}
-          SIZE_MB=$((SIZE_GB * 1024))
-          echo "Chunk size: ${SIZE_MB}MB"
+          FILE="ks_full_backup_2026.gz"
+          SIZE_MB=$((2 * 1024))
 
+          echo "Splitting $FILE into ${SIZE_MB}MB chunks..."
           rm -f chunk_* || true
-          split -b "${SIZE_MB}M" "${file_name}" chunk_
+          split -b "${SIZE_MB}M" "$FILE" chunk_
 
           echo "Created chunks:"
           ls -lh chunk_*
 
-          echo "Removing original big file to reclaim space..."
-          rm -f "${file_name}" || true
+          echo "Removing original file to reclaim space..."
+          rm -f "$FILE"
 
       - name: Create or update release
-        id: create_release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag }}
-          name: "Dataset Release - ${{ github.event.inputs.tag }}"
+          tag_name: dataset-v1
+          name: "Dataset Release - dataset-v1"
           draft: false
           prerelease: false
 
       - name: Upload chunks to release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.inputs.tag }}
+          tag_name: dataset-v1
           files: chunk_*
         continue-on-error: false
