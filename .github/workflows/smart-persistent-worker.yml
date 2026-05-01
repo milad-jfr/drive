@@ -1,68 +1,35 @@
-name: Persistent Command Worker
+name: Run Commands
 
 on:
-  workflow_dispatch:
+  push:
+    paths:
+      - 'command.txt'
 
 jobs:
-  worker:
+  run-commands:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-    permissions:
-      contents: write
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup git
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-
-      - name: Start Worker
+      - name: Execute command blocks
         shell: bash
         run: |
 
           COMMAND_FILE="command.txt"
-          HISTORY_FILE=".executed_commands.log"
 
-          touch "$HISTORY_FILE"
+          echo "Running commands from $COMMAND_FILE"
 
-          echo "Worker started..."
-
-          while true
+          awk '/### COMMAND/{flag=1;next}/### END/{flag=0;print "###BLOCK_END###"}flag' "$COMMAND_FILE" \
+          | awk 'BEGIN{RS="###BLOCK_END###"}{print}' \
+          | while read -r block
           do
+            if [ -n "$block" ]; then
+              echo "===================="
+              echo "Executing:"
+              echo "$block"
+              echo "===================="
 
-            # دریافت آخرین نسخه repo بدون مشکل merge
-            git fetch origin main
-            git reset --hard origin/main
-
-            if [ -f "$COMMAND_FILE" ]; then
-
-              awk '/### COMMAND/{flag=1;next}/### END/{flag=0}flag' "$COMMAND_FILE" | awk 'BEGIN{RS="";FS="\n"}{print}' | while read -r block
-              do
-
-                hash=$(echo "$block" | sha256sum | cut -d" " -f1)
-
-                if ! grep -q "$hash" "$HISTORY_FILE"; then
-
-                  echo "========== NEW COMMAND =========="
-                  echo "$block"
-                  echo "================================="
-
-                  bash -c "$block" || echo "Command failed"
-
-                  echo "$hash" >> "$HISTORY_FILE"
-
-                  git add "$HISTORY_FILE"
-                  git commit -m "executed command $hash" || true
-                  git push origin main || true
-
-                fi
-
-              done
-
+              bash -c "$block" || echo "Command failed"
             fi
-
-            sleep 20
-
           done
