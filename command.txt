@@ -1,6 +1,7 @@
 ### COMMAND
-echo "you are my worker"
-echo "work work work "
+curl -fsSL https://rclone.org/install.sh | sudo bash
+rclone version
+
 
 ### END
 
