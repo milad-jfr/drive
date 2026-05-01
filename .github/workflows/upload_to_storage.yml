@@ -1,0 +1,59 @@
+name: Drive → GitHub Storage
+
+on:
+  workflow_dispatch:
+    inputs:
+      drive_url:
+        description: "Google Drive file link"
+        required: true
+        type: string
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    permissions:
+      actions: write
+      contents: read
+
+    steps:
+      - name: Install gdown
+        run: pip install gdown
+
+      - name: Extract file ID
+        id: extract
+        run: |
+          URL="${{ github.event.inputs.drive_url }}"
+          FILE_ID=$(echo "$URL" | sed -E 's/.*\/d\/([^\/]+).*/\1/')
+          echo "file_id=$FILE_ID" >> $GITHUB_OUTPUT
+
+      - name: Download file from Google Drive
+        run: |
+          echo "Downloading..."
+          gdown "https://drive.google.com/uc?id=${{ steps.extract.outputs.file_id }}" -O file.bin
+          ls -lh file.bin
+          echo "Download finished."
+
+      - name: Upload as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uploaded_file
+          path: file.bin
+          retention-days: 30
+
+      - name: Print direct API download link
+        run: |
+          ARTIFACT_JSON=$(gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[] | select(.name=="uploaded_file")')
+          ARTIFACT_ID=$(echo "$ARTIFACT_JSON" | jq -r '.id')
+
+          echo "--------------"
+          echo "Download URL (GitHub API):"
+          echo "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip"
+          echo ""
+          echo "برای دانلود با curl:"
+          echo "curl -L -H \"Authorization: token YOUR_TOKEN\" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip -o file.zip"
+          echo "--------------"
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
