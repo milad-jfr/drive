@@ -1,9 +1,8 @@
 ### COMMAND
-clear
+echo " he is dead now !"
+echo "i will tell the story later"
 ### END
-### COMMAND
-clear
-### END
+
 
 
 
