@@ -1,59 +1,100 @@
-name: Drive → GitHub Storage
+name: Drive Persistent Split Upload
 
 on:
   workflow_dispatch:
     inputs:
       drive_url:
-        description: "Google Drive file link"
+        description: "Google Drive link"
         required: true
         type: string
 
+permissions:
+  contents: write
+
 jobs:
-  upload:
+  upload-segment:
     runs-on: ubuntu-latest
-
-    permissions:
-      actions: write
-      contents: read
-
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # افزایش بافر برای جلوگیری از خطای RPC
+          git config http.postBuffer 524288000
+
+      - name: Read State
+        id: state
+        run: |
+          if [ -f .upload_state ]; then
+            STATE=$(cat .upload_state)
+          else
+            STATE=0
+          fi
+          echo "current_segment=$STATE" >> $GITHUB_OUTPUT
+          echo "Current Segment to process: $STATE (each segment is 1GB)"
+
       - name: Install gdown
         run: pip install gdown
 
-      - name: Extract file ID
-        id: extract
+      - name: Download Full File
         run: |
-          URL="${{ github.event.inputs.drive_url }}"
-          FILE_ID=$(echo "$URL" | sed -E 's/.*\/d\/([^\/]+).*/\1/')
-          echo "file_id=$FILE_ID" >> $GITHUB_OUTPUT
+          echo "Downloading from Drive..."
+          gdown "${{ github.event.inputs.drive_url }}" -O bigfile_full
+          ls -lh bigfile_full
 
-      - name: Download file from Google Drive
+      - name: Extract 1GB Segment and Cleanup
         run: |
-          echo "Downloading..."
-          gdown "https://drive.google.com/uc?id=${{ steps.extract.outputs.file_id }}" -O file.bin
-          ls -lh file.bin
-          echo "Download finished."
+          SEGMENT_INDEX=${{ steps.state.outputs.current_segment }}
+          echo "Extracting 1GB starting from offset $((SEGMENT_INDEX))G..."
+          
+          # استخراج ۱ گیگابایت مشخص با دستور dd
+          dd if=bigfile_full of=active_segment bs=1G skip=$SEGMENT_INDEX count=1
+          
+          # حذف فایل اصلی ۱۰ گیگابایتی برای آزاد شدن فضا
+          rm bigfile_full
+          echo "Full file removed. 1GB segment ready."
+          ls -lh active_segment
 
-      - name: Upload as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: uploaded_file
-          path: file.bin
-          retention-days: 30
-
-      - name: Print direct API download link
+      - name: Split Segment into 99MB chunks
         run: |
-          ARTIFACT_JSON=$(gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[] | select(.name=="uploaded_file")')
-          ARTIFACT_ID=$(echo "$ARTIFACT_JSON" | jq -r '.id')
+          SEGMENT_INDEX=${{ steps.state.outputs.current_segment }}
+          # پارت‌ها را با نامی که شامل شماره سگمنت باشد می‌سازیم
+          split -b 99M active_segment "part_seg${SEGMENT_INDEX}_"
+          rm active_segment
+          ls -lh part_seg*
 
-          echo "--------------"
-          echo "Download URL (GitHub API):"
-          echo "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip"
-          echo ""
-          echo "برای دانلود با curl:"
-          echo "curl -L -H \"Authorization: token YOUR_TOKEN\" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip -o file.zip"
-          echo "--------------"
+      - name: Sequential Push with Delay
+        run: |
+          SEGMENT_INDEX=${{ steps.state.outputs.current_segment }}
+          
+          for file in part_seg${SEGMENT_INDEX}_*; do
+            echo "Adding $file..."
+            git add "$file"
+            git commit -m "Add chunk $file"
+            
+            echo "Pushing $file..."
+            # تلاش برای push با قابلیت تکرار در صورت شکست لحظه‌ای
+            for i in {1..3}; do
+              git push origin HEAD && break || sleep 15
+            done
+            
+            echo "Waiting 10 seconds before next chunk to avoid rate limit..."
+            sleep 10
+          done
 
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
+      - name: Update and Commit State
+        if: success()
+        run: |
+          OLD_STATE=${{ steps.state.outputs.current_segment }}
+          NEW_STATE=$((OLD_STATE + 1))
+          echo $NEW_STATE > .upload_state
+          
+          git add .upload_state
+          git commit -m "Update state to segment $NEW_STATE"
+          git push origin HEAD
+          echo "Finished segment $OLD_STATE. Next run will process segment $NEW_STATE."
