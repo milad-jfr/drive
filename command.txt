@@ -1,5 +1,6 @@
 ### COMMAND
-curl google.com
+echo "you are my worker"
+echo "work work work "
 
 ### END
 
