@@ -1,10 +1,10 @@
-name: Drive To Repo Chunked Uploader
+name: Full Download → Chunk → Upload
 
 on:
   workflow_dispatch:
     inputs:
       file_id:
-        description: "Google Drive File ID"
+        description: "Google Drive file ID"
         required: true
         type: string
 
@@ -19,88 +19,80 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup git identity
+      - name: Setup git
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com
 
-      - name: Load upload state
+      - name: Load state
         id: state
         run: |
           if [ -f .upload_state ]; then
             source .upload_state
           else
-            NEXT_PART=0
+            PART_INDEX=0
           fi
-          echo "next_part=$NEXT_PART" >> $GITHUB_OUTPUT
+          echo "part=$PART_INDEX" >> $GITHUB_OUTPUT
 
-      - name: First HTML request, get cookies
+      - name: Install gdown (simple Google Drive downloader)
         run: |
-          FILE_ID=${{ github.event.inputs.file_id }}
-          curl -s -c cookies.txt "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o page1.html
+          pip install gdown
 
-      - name: Parse Drive HTML & Get real download link or confirm token
-        id: link
+      - name: Download full file from Drive
         run: |
-          # تلاش برای پیدا کردن لینک واقعی دانلود
-          LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page1.html | head -n1)
-          if [ -z "$LINK" ]; then
-            # اگر نبود، باید confirm token را بگیریم
-            CONFIRM=$(grep -o 'confirm=[^&"]*' page1.html | head -n1 | cut -d= -f2)
-            FILE_ID=${{ github.event.inputs.file_id }}
-            curl -s -b cookies.txt -c cookies.txt \
-              "https://drive.google.com/uc?export=download&confirm=${CONFIRM}&id=${FILE_ID}" \
-              -o page2.html
-            LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page2.html | head -n1)
-          fi
-          if [ -z "$LINK" ]; then
-            echo "❌  Download link not found!"
-            exit 1
-          fi
-          echo "real_link=$LINK" >> $GITHUB_OUTPUT
+          FILE_ID="${{ github.event.inputs.file_id }}"
+          echo "Downloading full file..."
+          gdown "https://drive.google.com/uc?id=${FILE_ID}" -O full.bin
+          echo "Download completed."
 
-      - name: Download 50MB chunk (no -L!)
-        id: dl
+      - name: Chunk & Upload parts
+        id: process
         run: |
-          PART=${{ steps.state.outputs.next_part }}
-          CHUNK_SIZE=$((50*1024*1024))
-          START=$((PART*CHUNK_SIZE))
-          END=$((START+CHUNK_SIZE-1))
-          echo "Downloading chunk [$START-$END] (part $PART)"
+          PART=${{ steps.state.outputs.part }}
+          SIZE_PER_PART=$((1024*1024*1024))    # 1GB per part
+          FILE_SIZE=$(stat -c%s "full.bin")
 
-          curl -s \
-            -b cookies.txt \
-            -H "Range: bytes=${START}-${END}" \
-            "${{ steps.link.outputs.real_link }}" \
-            -o chunk_${PART}.bin
-          
-          BYTES=$(stat -c%s chunk_${PART}.bin)
-          echo "chunk_bytes=$BYTES" >> $GITHUB_OUTPUT
-          # اگر سایز فایل کوچکتر از 1MB شد احتمالا تمام شده (یا مشکل)
-          if [ "$BYTES" -lt 1000000 ]; then
+          echo "Full file size: $FILE_SIZE bytes"
+          echo "Current part index: $PART"
+
+          START=$((PART * SIZE_PER_PART))
+
+          if [ $START -ge $FILE_SIZE ]; then
             echo "finished=true" >> $GITHUB_OUTPUT
-          else
-            echo "finished=false" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
-      - name: Stop if file finished
-        if: steps.dl.outputs.finished == 'true'
-        run: echo "File fully downloaded! Workflow finished."
+          END=$((START + SIZE_PER_PART))
+          if [ $END -gt $FILE_SIZE ]; then
+            END=$FILE_SIZE
+          fi
 
-      - name: Commit and push chunk
-        if: steps.dl.outputs.finished == 'false'
+          PART_FILENAME="part_${PART}.bin"
+
+          echo "Extracting bytes $START to $END → $PART_FILENAME"
+
+          dd if="full.bin" of="$PART_FILENAME" bs=1 skip=$START count=$((END - START)) status=none
+
+          echo "finished=false" >> $GITHUB_OUTPUT
+
+      - name: Commit & Push chunk
+        if: steps.process.outputs.finished == 'false'
         run: |
-          PART=${{ steps.state.outputs.next_part }}
-          git add chunk_${PART}.bin
-          git commit -m "Upload chunk $PART"
+          PART=${{ steps.state.outputs.part }}
+          git add "part_${PART}.bin"
+          git commit -m "Upload part $PART"
           git push
 
-      - name: Advance upload state
-        if: steps.dl.outputs.finished == 'false'
+      - name: Update state
+        if: steps.process.outputs.finished == 'false'
         run: |
-          PART=${{ steps.state.outputs.next_part }}
+          PART=${{ steps.state.outputs.part }}
           NEXT=$((PART+1))
-          echo "NEXT_PART=$NEXT" > .upload_state
+          echo "PART_INDEX=$NEXT" > .upload_state
           git add .upload_state
-          git commit -m "Update upload state, part $NEXT"
+          git commit -m "State update: part $NEXT"
           git push
+
+      - name: Done
+        if: steps.process.outputs.finished == 'true'
+        run: echo "All parts uploaded. Completed."
