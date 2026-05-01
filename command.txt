@@ -1,8 +1,5 @@
 ### COMMAND
-mega-version
-
-
-
+mega-login j.milad@gmail.com mm1mmsMAWERTY&
 
 ### END
 
