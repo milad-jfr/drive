@@ -1,8 +1,8 @@
 ### COMMAND
-echo "salaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaam"
+clear
 ### END
 ### COMMAND
-curl -I https://khodrosoft.com
+clear
 ### END
 
 
