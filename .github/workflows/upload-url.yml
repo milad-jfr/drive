@@ -1,10 +1,10 @@
-name: Drive Auto Confirm Upload (Chunked)
+name: Drive Chunk Upload
 
 on:
   workflow_dispatch:
     inputs:
       file_id:
-        description: "Google Drive File ID (from the link)"
+        description: "Google Drive File ID"
         required: true
         type: string
 
@@ -12,102 +12,109 @@ permissions:
   contents: write
 
 jobs:
-  upload-chunk:
+  upload:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Configure Git
+      - name: Setup git
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
 
-      # ------------------ Read Upload State ------------------
-      - name: Read upload state
-        id: st
+      - name: Read state
+        id: state
         run: |
           if [ -f .upload_state ]; then
             source .upload_state
           else
             NEXT_PART=0
           fi
-          echo "next=$NEXT_PART" >> $GITHUB_OUTPUT
+          echo "part=$NEXT_PART" >> $GITHUB_OUTPUT
 
-      # ------------------ Get Confirm Token & Cookie ------------------
-      - name: Extract token and cookie
-        id: token
+      - name: Get download page
         run: |
           FILE_ID=${{ github.event.inputs.file_id }}
-          
-          # Request page and store cookies
-          curl -s -c cookies.txt -L "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o page.html
 
-          # Extract confirm token
-          CONFIRM=$(grep -o 'confirm=[^&]*' page.html | head -n1 | cut -d= -f2 || true)
+          curl -L -s -c cookies.txt \
+          "https://drive.google.com/uc?export=download&id=${FILE_ID}" \
+          -o page.html
 
-          if [ -z "$CONFIRM" ]; then
-            echo "⚠️ Confirm token not found, may not be needed."
-            echo "token=" >> $GITHUB_OUTPUT
-          else
-            echo "✅ Confirm token extracted: $CONFIRM"
-            echo "token=$CONFIRM" >> $GITHUB_OUTPUT
+      - name: Extract real download link
+        id: link
+        run: |
+
+          LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page.html | head -n1)
+
+          if [ -z "$LINK" ]; then
+            CONFIRM=$(grep -o 'confirm=[^&"]*' page.html | head -n1 | cut -d= -f2)
+
+            FILE_ID=${{ github.event.inputs.file_id }}
+
+            curl -L -s -b cookies.txt -c cookies.txt \
+            "https://drive.google.com/uc?export=download&confirm=${CONFIRM}&id=${FILE_ID}" \
+            -o page2.html
+
+            LINK=$(grep -o 'https://drive.usercontent.google.com/download[^"]*' page2.html | head -n1)
           fi
 
-      # ------------------ Download One Chunk ------------------
+          echo "link=$LINK" >> $GITHUB_OUTPUT
+          echo "Download link found"
+
       - name: Download chunk
-        id: dl
+        id: download
         run: |
-          FILE_ID=${{ github.event.inputs.file_id }}
-          TOKEN=${{ steps.token.outputs.token }}
-          PART=${{ steps.st.outputs.next }}
-          CHUNK_SIZE=$((50 * 1024 * 1024))  # 50 MB
-          START=$((PART * CHUNK_SIZE))
-          END=$((START + CHUNK_SIZE - 1))
 
-          echo "Downloading bytes $START-$END (part $PART)"
-          
-          BASE_URL="https://drive.google.com/uc?export=download&id=${FILE_ID}"
-          if [ -n "$TOKEN" ]; then
-            BASE_URL="${BASE_URL}&confirm=${TOKEN}"
-          fi
+          PART=${{ steps.state.outputs.part }}
 
-          curl -L -b cookies.txt -H "Range: bytes=$START-$END" \
-            "$BASE_URL" -o "chunk_${PART}.bin"
+          CHUNK=$((50*1024*1024))
+          START=$((PART*CHUNK))
+          END=$((START+CHUNK-1))
 
-          if [ ! -s "chunk_${PART}.bin" ]; then
-            echo "Chunk is empty → reached end of file."
+          echo "Downloading chunk $PART ($START-$END)"
+
+          curl -L \
+          -b cookies.txt \
+          -H "Range: bytes=${START}-${END}" \
+          "${{ steps.link.outputs.link }}" \
+          -o chunk_${PART}.bin
+
+          SIZE=$(stat -c%s chunk_${PART}.bin)
+
+          echo "Chunk size $SIZE"
+
+          if [ "$SIZE" -lt 1000 ]; then
             echo "stop=true" >> $GITHUB_OUTPUT
           else
             echo "stop=false" >> $GITHUB_OUTPUT
           fi
 
-      # ------------------ Stop if finished ------------------
-      - name: No more chunks
-        if: steps.dl.outputs.stop == 'true'
+      - name: Stop if finished
+        if: steps.download.outputs.stop == 'true'
         run: |
-          echo "✅ All chunks uploaded. Workflow completed."
-          exit 0
+          echo "Download finished"
 
-      # ------------------ Commit + Push ------------------
-      - name: Commit and push chunk
+      - name: Commit chunk
+        if: steps.download.outputs.stop == 'false'
         run: |
-          PART=${{ steps.st.outputs.next }}
-          git add "chunk_${PART}.bin"
-          git commit -m "Upload chunk $PART"
-          echo "Wait 30 seconds before push..."
-          sleep 30
-          git push origin HEAD
+          PART=${{ steps.state.outputs.part }}
 
-      # ------------------ Update Upload State ------------------
+          git add chunk_${PART}.bin
+          git commit -m "chunk $PART"
+          git push
+
       - name: Update state
+        if: steps.download.outputs.stop == 'false'
         run: |
-          PART=${{ steps.st.outputs.next }}
-          NEXT=$((PART + 1))
+          PART=${{ steps.state.outputs.part }}
+          NEXT=$((PART+1))
+
           echo "NEXT_PART=$NEXT" > .upload_state
+
           git add .upload_state
-          git commit -m "Update next part = $NEXT"
-          git push origin HEAD
+          git commit -m "state $NEXT"
+          git push
