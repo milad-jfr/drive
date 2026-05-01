@@ -5,3 +5,7 @@
 echo "this is a new command youhoooooouuuu!!!!!!!!!!!!!!!!!!!"
 
 curl -I https://khodrosoft.com
+
+clear
+clear
+clear
