@@ -1,7 +1,5 @@
 ### COMMAND
-echo "ok lets continue
-thic is my new machine , you know 
-i need this "
+curl google.com
 
 ### END
 
