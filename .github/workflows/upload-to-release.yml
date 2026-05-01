@@ -1,0 +1,80 @@
+name: Drive Download + Chunked Release Upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      drive_url:
+        description: "Google Drive direct link"
+        required: true
+        type: string
+      tag:
+        description: "Release tag (example: dataset-v1)"
+        required: true
+        type: string
+      chunk_size_gb:
+        description: "Chunk size in GB (max 2GB recommended)"
+        required: false
+        type: string
+        default: "2"
+
+permissions:
+  contents: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip
+          pip install gdown
+
+      - name: Download file from Google Drive
+        run: |
+          echo "Downloading..."
+          gdown "${{ github.event.inputs.drive_url }}" -O bigfile
+          echo "Downloaded:"
+          ls -lh bigfile
+
+      - name: Split into chunks
+        run: |
+          SIZE_GB=${{ github.event.inputs.chunk_size_gb }}
+          SIZE_MB=$((SIZE_GB * 1024))
+          echo "Chunk size: ${SIZE_MB}MB"
+
+          rm -f chunk_* || true
+          split -b "${SIZE_MB}M" bigfile chunk_
+
+          echo "Created chunks:"
+          ls -lh chunk_*
+
+      - name: Create or update release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: "Dataset Release - ${{ github.event.inputs.tag }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload chunks to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          files: chunk_*
+        continue-on-error: false
+
+      - name: Print direct download URLs
+        run: |
+          echo "=============================="
+          echo "Release Direct Download Links:"
+          echo "=============================="
+
+          TAG="${{ github.event.inputs.tag }}"
+          REPO="${GITHUB_REPOSITORY}"
+
+          for f in chunk_*; do
+            echo "https://github.com/${REPO}/releases/download/${TAG}/${f}"
+          done
