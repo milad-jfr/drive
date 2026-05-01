@@ -1,5 +1,5 @@
 ### COMMAND
-curl -I https://github.com/milad-jfr/drive/releases/download/dataset-v1/chunk_aa
+curl -I -L https://github.com/milad-jfr/drive/releases/download/dataset-v1/chunk_aa
 ### END
 
 
