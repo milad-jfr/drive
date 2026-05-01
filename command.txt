@@ -1,3 +1,5 @@
     echo "Hello from GitHub Actions runner!"
     curl -I https://www.google.com # -I فقط headerها را نشان می‌دهد تا لاگ خیلی طولانی نشود
     ls -la
+
+echo "this is a new command youhoooooouuuu!!!!!!!!!!!!!!!!!!!"
