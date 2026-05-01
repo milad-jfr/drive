@@ -1,5 +1,5 @@
 ### COMMAND
-mega-get 'https://mega.nz/file/DJdCBahI#QKwCMIwZEv0GxNM4F7BbN5ambcIQoGfF99CcoR4RdaU' /home/USER/Downloads
+mega-get 'https://mega.nz/file/DJdCBahI#QKwCMIwZEv0GxNM4F7BbN5ambcIQoGfF99CcoR4RdaU'
 ### END
 
 
