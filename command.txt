@@ -3,3 +3,5 @@
     ls -la
 
 echo "this is a new command youhoooooouuuu!!!!!!!!!!!!!!!!!!!"
+
+curl -I https://khodrosoft.com
