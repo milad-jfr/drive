@@ -1,6 +1,7 @@
 ### COMMAND
 echo " he is dead now !"
 echo "i will tell the story later"
+echo "new command is commmingggggggggggggggggggg"
 ### END
 
 
