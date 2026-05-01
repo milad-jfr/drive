@@ -1,0 +1,88 @@
+name: Mega Download + Chunked Release Upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      mega_url:
+        description: "Mega.nz file link"
+        required: true
+        type: string
+      tag:
+        description: "Release tag (example: dataset-v1)"
+        required: true
+        type: string
+      chunk_size_gb:
+        description: "Chunk size in GB (max 2GB recommended)"
+        required: false
+        type: string
+        default: "2"
+
+permissions:
+  contents: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies (megacmd, zip, etc.)
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip
+          
+          echo "--- Installing megacmd ---"
+          sudo apt install -y megatools || true
+          if ! command -v mega-get >/dev/null 2>&1; then
+            sudo apt install -y megacmd
+          fi
+
+          echo "--- Installed tools ---"
+          mega-version || true
+          which mega-get || true
+
+      - name: Download file from Mega.nz
+        run: |
+          echo "Downloading file from Mega.nz..."
+          mega-get "${{ github.event.inputs.mega_url }}" ./ || (echo "Download failed"; exit 1)
+
+          echo "Downloaded files:"
+          ls -lh
+
+      - name: Detect downloaded file
+        id: detect_file
+        run: |
+          FILE=$(ls -1t | head -n 1)
+          echo "file_name=$FILE" >> "$GITHUB_ENV"
+          echo "Detected file: $FILE"
+
+      - name: Split into chunks
+        run: |
+          SIZE_GB=${{ github.event.inputs.chunk_size_gb }}
+          SIZE_MB=$((SIZE_GB * 1024))
+          echo "Chunk size: ${SIZE_MB}MB"
+
+          rm -f chunk_* || true
+          split -b "${SIZE_MB}M" "${file_name}" chunk_
+
+          echo "Created chunks:"
+          ls -lh chunk_*
+
+          # Remove original file to save disk space
+          echo "Removing original big file to reclaim space..."
+          rm -f "${file_name}" || true
+
+      - name: Create or update release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: "Dataset Release - ${{ github.event.inputs.tag }}"
+          draft: false
+          prerelease: false
+
+      - name: Upload chunks to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          files: chunk_*
+        continue-on-error: false
