@@ -1,5 +1,5 @@
 ### COMMAND
-echo "im still alive"
+curl -I https://khodrosoft.com
 ### END
 
 
