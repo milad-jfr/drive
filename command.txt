@@ -1,5 +1,6 @@
 ### COMMAND
-curl -sI -L https://github.com/milad-jfr/drive/releases/download/dataset-v1/chunk_aa | grep -E "HTTP/|content-length"
+cat /etc/os-release
+
 
 ### END
 
