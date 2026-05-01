@@ -1,59 +1,38 @@
-name: Drive → GitHub Storage
+name: Upload Test Artifact
 
 on:
   workflow_dispatch:
-    inputs:
-      drive_url:
-        description: "Google Drive file link"
-        required: true
-        type: string
 
 jobs:
   upload:
     runs-on: ubuntu-latest
 
-    permissions:
-      actions: write
-      contents: read
-
     steps:
-      - name: Install gdown
-        run: pip install gdown
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Extract file ID
-        id: extract
+      - name: Create test file
         run: |
-          URL="${{ github.event.inputs.drive_url }}"
-          FILE_ID=$(echo "$URL" | sed -E 's/.*\/d\/([^\/]+).*/\1/')
-          echo "file_id=$FILE_ID" >> $GITHUB_OUTPUT
+          echo "hello world" > test.txt
 
-      - name: Download file from Google Drive
-        run: |
-          echo "Downloading..."
-          gdown "https://drive.google.com/uc?id=${{ steps.extract.outputs.file_id }}" -O file.bin
-          ls -lh file.bin
-          echo "Download finished."
-
-      - name: Upload as artifact
+      - name: Upload artifact
+        id: upload_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: uploaded_file
-          path: file.bin
-          retention-days: 30
+          name: myfile
+          path: test.txt
 
-      - name: Print direct API download link
+      - name: Print easy download link
         run: |
-          ARTIFACT_JSON=$(gh api repos/${{ github.repository }}/actions/artifacts --jq '.artifacts[] | select(.name=="uploaded_file")')
-          ARTIFACT_ID=$(echo "$ARTIFACT_JSON" | jq -r '.id')
-
-          echo "--------------"
-          echo "Download URL (GitHub API):"
-          echo "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip"
+          echo "== Artifact Info =="
+          echo "Artifact Name: myfile"
           echo ""
-          echo "برای دانلود با curl:"
-          echo "curl -L -H \"Authorization: token YOUR_TOKEN\" https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$ARTIFACT_ID/zip -o file.zip"
-          echo "--------------"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Repo: ${{ github.repository }}"
+          echo ""
 
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_REPO: ${{ github.repository }}
+          # لینک قابل‌کلیک برای دانلود
+          echo "Download Page:"
+          echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          echo ""
+          echo "در این صفحه بخش Artifacts را باز کن و روی myfile کلیک کن."
