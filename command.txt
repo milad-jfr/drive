@@ -1,15 +1,8 @@
 ### COMMAND
-echo "hello from runner"
-ls -la
+echo "ok this is a nice hack , have fun!
 ### END
-
 
 ### COMMAND
-curl -I https://google.com
+echo ha ha ha 
 ### END
 
-
-### COMMAND
-echo "test 123"
-uname -a
-### END
