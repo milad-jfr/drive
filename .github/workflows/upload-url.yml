@@ -1,10 +1,10 @@
-name: Drive Chunk Upload (Range Download)
+name: Drive Auto Confirm Upload (Chunked)
 
 on:
   workflow_dispatch:
     inputs:
-      drive_url:
-        description: "Direct downloadable link to Google Drive file"
+      file_id:
+        description: "Google Drive File ID (from the link)"
         required: true
         type: string
 
@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -26,7 +26,7 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # ------------------ READ STATE ------------------
+      # ------------------ Read Upload State ------------------
       - name: Read upload state
         id: st
         run: |
@@ -37,56 +37,77 @@ jobs:
           fi
           echo "next=$NEXT_PART" >> $GITHUB_OUTPUT
 
-      # ------------------ DOWNLOAD ONE CHUNK ------------------
-      - name: Download chunk using Range
+      # ------------------ Get Confirm Token & Cookie ------------------
+      - name: Extract token and cookie
+        id: token
+        run: |
+          FILE_ID=${{ github.event.inputs.file_id }}
+          
+          # Request page and store cookies
+          curl -s -c cookies.txt -L "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o page.html
+
+          # Extract confirm token
+          CONFIRM=$(grep -o 'confirm=[^&]*' page.html | head -n1 | cut -d= -f2 || true)
+
+          if [ -z "$CONFIRM" ]; then
+            echo "⚠️ Confirm token not found, may not be needed."
+            echo "token=" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Confirm token extracted: $CONFIRM"
+            echo "token=$CONFIRM" >> $GITHUB_OUTPUT
+          fi
+
+      # ------------------ Download One Chunk ------------------
+      - name: Download chunk
         id: dl
         run: |
+          FILE_ID=${{ github.event.inputs.file_id }}
+          TOKEN=${{ steps.token.outputs.token }}
           PART=${{ steps.st.outputs.next }}
-          CHUNK_SIZE=$((50 * 1024 * 1024))     # 50 MB
+          CHUNK_SIZE=$((50 * 1024 * 1024))  # 50 MB
           START=$((PART * CHUNK_SIZE))
           END=$((START + CHUNK_SIZE - 1))
 
-          echo "Downloading part $PART (bytes $START-$END)"
+          echo "Downloading bytes $START-$END (part $PART)"
+          
+          BASE_URL="https://drive.google.com/uc?export=download&id=${FILE_ID}"
+          if [ -n "$TOKEN" ]; then
+            BASE_URL="${BASE_URL}&confirm=${TOKEN}"
+          fi
 
-          curl -L \
-            -H "Range: bytes=$START-$END" \
-            "${{ github.event.inputs.drive_url }}" \
-            -o "chunk_${PART}.bin"
+          curl -L -b cookies.txt -H "Range: bytes=$START-$END" \
+            "$BASE_URL" -o "chunk_${PART}.bin"
 
           if [ ! -s "chunk_${PART}.bin" ]; then
-            echo "Chunk is empty. Probably end of file reached."
+            echo "Chunk is empty → reached end of file."
             echo "stop=true" >> $GITHUB_OUTPUT
           else
             echo "stop=false" >> $GITHUB_OUTPUT
           fi
 
-      # ------------------ STOP IF NO MORE DATA ------------------
+      # ------------------ Stop if finished ------------------
       - name: No more chunks
         if: steps.dl.outputs.stop == 'true'
         run: |
-          echo "All chunks processed. Job finished."
+          echo "✅ All chunks uploaded. Workflow completed."
           exit 0
 
-      # ------------------ COMMIT + PUSH ------------------
-      - name: Commit and push
+      # ------------------ Commit + Push ------------------
+      - name: Commit and push chunk
         run: |
           PART=${{ steps.st.outputs.next }}
-
           git add "chunk_${PART}.bin"
           git commit -m "Upload chunk $PART"
-          
-          echo "Waiting 30 seconds before push (GitHub safety delay)..."
+          echo "Wait 30 seconds before push..."
           sleep 30
-
           git push origin HEAD
 
-      # ------------------ UPDATE STATE ------------------
-      - name: Update session state
+      # ------------------ Update Upload State ------------------
+      - name: Update state
         run: |
           PART=${{ steps.st.outputs.next }}
           NEXT=$((PART + 1))
           echo "NEXT_PART=$NEXT" > .upload_state
-
           git add .upload_state
-          git commit -m "Update state: next part = $NEXT"
+          git commit -m "Update next part = $NEXT"
           git push origin HEAD
