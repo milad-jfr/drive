@@ -12,67 +12,55 @@ jobs:
 
     steps:
 
-      - name: Free Disk Space (Required for 12GB files)
+      - name: Free Disk Space
         run: |
-          echo "Freeing space..."
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
           sudo rm -rf /opt/ghc
           sudo rm -rf /usr/local/share/boost
           df -h
 
-      - name: Install dependencies (megacmd via .deb)
+      - name: Install megacmd
         run: |
           sudo apt update
           sudo apt install -y wget zip unzip
-
-          echo "--- Installing megacmd ---"
           wget https://mega.nz/linux/repo/xUbuntu_22.04/amd64/megacmd-xUbuntu_22.04_amd64.deb -O megacmd.deb
           sudo apt install -y ./megacmd.deb
           rm -f megacmd.deb
 
-          mega-cmd --version || true
-          which mega-get || true
-
-      - name: Download fixed Mega file (ks_full_backup_2026.gz)
+      - name: Download Mega file
         run: |
-          echo "Downloading file from Mega.nz..."
           mega-get "https://mega.nz/file/DJdCBahI#QKwCMIwZEv0GxNM4F7BbN5ambcIQoGfF99CcoR4RdaU" .
 
-          echo "Downloaded files:"
-          ls -lh
-
           if [ ! -f "ks_full_backup_2026.gz" ]; then
-            echo "ERROR: File ks_full_backup_2026.gz not found!"
+            echo "Download failed"
             exit 1
           fi
 
-      - name: Split file into 2GB chunks
+          ls -lh
+
+      - name: Split file into safe chunks (<2GB)
         run: |
           FILE="ks_full_backup_2026.gz"
-          SIZE_MB=$((2 * 1024))
 
-          echo "Splitting $FILE into ${SIZE_MB}MB chunks..."
-          rm -f chunk_* || true
-          split -b "${SIZE_MB}M" "$FILE" chunk_
+          echo "Splitting file into 1900MB chunks..."
+          split -b 1900M "$FILE" chunk_
 
-          echo "Created chunks:"
+          echo "Chunks created:"
           ls -lh chunk_*
 
-          echo "Removing original file to reclaim space..."
           rm -f "$FILE"
 
       - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: dataset-v1
-          name: "Dataset Release - dataset-v1"
+          name: Dataset Release - dataset-v1
           draft: false
           prerelease: false
 
-      - name: Upload chunks to release
+      - name: Upload chunks
         uses: softprops/action-gh-release@v2
         with:
           tag_name: dataset-v1
           files: chunk_*
-        continue-on-error: false
