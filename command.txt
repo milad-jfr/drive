@@ -1,8 +1,7 @@
 ### COMMAND
-echo "ok this is a nice hack , have fun!
+echo "ok lets do a new test"
+curl -I https://khodrosoft.com
+echo "fine'
 ### END
 
-### COMMAND
-echo ha ha ha 
-### END
 
