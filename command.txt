@@ -1,8 +1,5 @@
 ### COMMAND
-rclone config
-
-
-
+curl -I https://github.com/milad-jfr/drive/releases/download/dataset-v1/chunk_aa
 ### END
 
 
