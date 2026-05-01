@@ -25,19 +25,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install dependencies (megacmd, zip, etc.)
+      - name: Install dependencies (megacmd via .deb)
         run: |
           sudo apt update
-          sudo apt install -y zip unzip
-          
-          echo "--- Installing megacmd ---"
-          sudo apt install -y megatools || true
-          if ! command -v mega-get >/dev/null 2>&1; then
-            sudo apt install -y megacmd
-          fi
+          sudo apt install -y wget zip unzip
+
+          echo "--- Installing megacmd (via .deb) ---"
+          wget https://mega.nz/linux/repo/xUbuntu_22.04/amd64/megacmd-xUbuntu_22.04_amd64.deb -O megacmd.deb
+          sudo apt install -y ./megacmd.deb
 
           echo "--- Installed tools ---"
-          mega-version || true
+          mega-cmd --version || true
           which mega-get || true
 
       - name: Download file from Mega.nz
@@ -67,7 +65,6 @@ jobs:
           echo "Created chunks:"
           ls -lh chunk_*
 
-          # Remove original file to save disk space
           echo "Removing original big file to reclaim space..."
           rm -f "${file_name}" || true
 
