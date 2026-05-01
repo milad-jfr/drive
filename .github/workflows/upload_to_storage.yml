@@ -1,38 +1,45 @@
-name: Upload Test Artifact
+name: Download File And Upload Artifact
 
 on:
   workflow_dispatch:
+    inputs:
+      url:
+        description: "Download URL"
+        required: true
 
 jobs:
-  upload:
+  download:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create test file
+      - name: Download file
         run: |
-          echo "hello world" > test.txt
+          mkdir download
+          cd download
+          echo "Downloading..."
+          curl -L "${{ github.event.inputs.url }}" -o file
+
+      - name: Show file info
+        run: |
+          ls -lh download
 
       - name: Upload artifact
-        id: upload_artifact
         uses: actions/upload-artifact@v4
         with:
-          name: myfile
-          path: test.txt
+          name: downloaded-file
+          path: download/
 
-      - name: Print easy download link
+      - name: Print download page
         run: |
-          echo "== Artifact Info =="
-          echo "Artifact Name: myfile"
           echo ""
-          echo "Run ID: ${{ github.run_id }}"
-          echo "Repo: ${{ github.repository }}"
+          echo "===================================="
+          echo "Artifact ready for download"
           echo ""
-
-          # لینک قابل‌کلیک برای دانلود
-          echo "Download Page:"
+          echo "Open this page:"
           echo "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           echo ""
-          echo "در این صفحه بخش Artifacts را باز کن و روی myfile کلیک کن."
+          echo "Scroll to the Artifacts section and download the file."
+          echo "===================================="
