@@ -34,15 +34,19 @@ jobs:
       - name: Download file from Drive
         run: |
           echo "Downloading file..."
-          filename=$(gdown "${{ github.event.inputs.drive_url }}" --no-cookies --name) || exit 1
-          echo "Downloaded file named: $filename"
+          gdown "${{ github.event.inputs.drive_url }}" --no-cookies
+
+          filename=$(ls -t | head -n 1)
+          echo "FILE_NAME=$filename" >> $GITHUB_ENV
+
+          echo "Downloaded file: $filename"
           ls -lh "$filename"
 
       - name: Split into chunks <100MB
         run: |
           rm -f part_* || true
           echo "Splitting file..."
-          split -b 90M "$filename" part_
+          split -b 90M "$FILE_NAME" part_
           echo "Chunks created:"
           ls -lh part_*
 
