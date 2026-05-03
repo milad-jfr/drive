@@ -31,54 +31,77 @@ jobs:
       - name: Install gdown
         run: pip install gdown
 
+      - name: Detect default branch
+        run: |
+          branch="${{ github.event.repository.default_branch }}"
+          echo "DEFAULT_BRANCH=$branch" >> $GITHUB_ENV
+
       - name: Download file from Drive
         run: |
-          echo "Downloading file..."
-          gdown "${{ github.event.inputs.drive_url }}" -O bigfile || exit 1
-          ls -lh bigfile
+          set -e
+          before=$(mktemp)
+          after=$(mktemp)
 
-      - name: Split into chunks <100MB
+          find . -maxdepth 1 -type f -printf "%f\n" | sort > "$before"
+          gdown "${{ github.event.inputs.drive_url }}" --no-cookies
+          find . -maxdepth 1 -type f -printf "%f\n" | sort > "$after"
+
+          filename=$(comm -13 "$before" "$after" | head -n 1)
+
+          if [ -z "$filename" ]; then
+            echo "Download failed"
+            exit 1
+          fi
+
+          echo "FILE_NAME=$filename" >> $GITHUB_ENV
+          echo "Downloaded file: $filename"
+          ls -lh "$filename"
+
+      - name: Split if needed
         run: |
-          rm -f part_* || true
-          echo "Splitting file..."
-          split -b 90M bigfile part_
-          echo "Chunks created:"
-          ls -lh part_*
+          set -e
+          size=$(stat -c%s "$FILE_NAME")
+          limit=$((95*1024*1024))
 
-      - name: Stage and push chunks in batches
+          if [ "$size" -lt "$limit" ]; then
+            echo "File smaller than 95MB, skipping split"
+            echo "$FILE_NAME" > upload_list.txt
+          else
+            echo "Splitting file..."
+            prefix="${FILE_NAME}.part_"
+            split -b 90M "$FILE_NAME" "$prefix"
+            ls -lh ${FILE_NAME}.part_*
+            ls ${FILE_NAME}.part_* > upload_list.txt
+          fi
+
+      - name: Stage and push in batches
         run: |
           set -e
           batch_size=30
           counter=0
+          branch="$DEFAULT_BRANCH"
 
-          git fetch origin main || git fetch origin master || true
+          git fetch origin "$branch" || true
 
-          for file in part_*; do
-            # اگر قبلاً در repo بوده → skip
-            if git ls-tree -r origin/main --name-only | grep -qx "$file"; then
-              echo "Skip already uploaded: $file"
+          while read file; do
+            if git ls-tree -r "origin/$branch" --name-only | grep -Fxq "$file"; then
+              echo "Skip existing: $file"
               continue
             fi
 
             git add "$file"
             counter=$((counter+1))
 
-            # اگر batch پر شد → commit + push
-            if [ $counter -ge $batch_size ]; then
-              git commit -m "Add $counter chunks batch"
-              echo "Pushing batch..."
-              if git push origin HEAD; then
-                echo "Batch OK"
-              else
-                echo "Push failed → resume on next run"
-                exit 1
+            if [ "$counter" -ge "$batch_size" ]; then
+              if ! git diff --cached --quiet; then
+                git commit -m "Add $counter files batch"
+                git push origin HEAD:"$branch" || exit 1
               fi
               counter=0
             fi
-          done
+          done < upload_list.txt
 
-          # Push نهایی اگر تعداد کمی chunk باقی مانده باشد
-          if git diff --cached --name-only | grep -q .; then
+          if ! git diff --cached --quiet; then
             git commit -m "Final batch"
-            git push origin HEAD || echo "Final push failed → will resume next time"
+            git push origin HEAD:"$branch" || exit 1
           fi
