@@ -31,21 +31,39 @@ jobs:
       - name: Install gdown
         run: pip install gdown
 
+      - name: Detect default branch
+        run: |
+          branch="${{ github.event.repository.default_branch }}"
+          echo "DEFAULT_BRANCH=$branch" >> "$GITHUB_ENV"
+          echo "Default branch: $branch"
+
       - name: Download file from Drive
         run: |
+          set -e
           echo "Downloading file..."
+          before=$(mktemp)
+          after=$(mktemp)
+
+          find . -maxdepth 1 -type f ! -name "$before" ! -name "$after" -printf "%f\n" | sort > "$before"
           gdown "${{ github.event.inputs.drive_url }}" --no-cookies
+          find . -maxdepth 1 -type f ! -name "$before" ! -name "$after" -printf "%f\n" | sort > "$after"
 
-          filename=$(ls -t | head -n 1)
-          echo "FILE_NAME=$filename" >> $GITHUB_ENV
+          filename=$(comm -13 "$before" "$after" | head -n 1)
 
+          if [ -z "$filename" ]; then
+            echo "Could not detect downloaded file"
+            exit 1
+          fi
+
+          echo "FILE_NAME=$filename" >> "$GITHUB_ENV"
           echo "Downloaded file: $filename"
           ls -lh "$filename"
 
       - name: Split into chunks <100MB
         run: |
+          set -e
           rm -f part_* || true
-          echo "Splitting file..."
+          echo "Splitting file: $FILE_NAME"
           split -b 90M "$FILE_NAME" part_
           echo "Chunks created:"
           ls -lh part_*
@@ -55,32 +73,42 @@ jobs:
           set -e
           batch_size=30
           counter=0
+          branch="$DEFAULT_BRANCH"
 
-          git fetch origin main || git fetch origin master || true
+          git fetch origin "$branch" || true
 
           for file in part_*; do
-            if git ls-tree -r origin/main --name-only | grep -qx "$file"; then
+            if git ls-tree -r "origin/$branch" --name-only | grep -Fxq "$file"; then
               echo "Skip already uploaded: $file"
               continue
             fi
 
             git add "$file"
-            counter=$((counter+1))
+            counter=$((counter + 1))
 
-            if [ $counter -ge $batch_size ]; then
-              git commit -m "Add $counter chunks batch"
-              echo "Pushing batch..."
-              if git push origin HEAD; then
-                echo "Batch OK"
+            if [ "$counter" -ge "$batch_size" ]; then
+              if git diff --cached --quiet; then
+                echo "Nothing to commit in this batch"
               else
-                echo "Push failed → resume on next run"
-                exit 1
+                git commit -m "Add $counter chunks batch"
+                echo "Pushing batch..."
+                if git push origin HEAD:"$branch"; then
+                  echo "Batch OK"
+                else
+                  echo "Push failed, resume on next run"
+                  exit 1
+                fi
               fi
               counter=0
             fi
           done
 
-          if git diff --cached --name-only | grep -q .; then
+          if git diff --cached --quiet; then
+            echo "No remaining chunks to commit"
+          else
             git commit -m "Final batch"
-            git push origin HEAD || echo "Final push failed → will resume next time"
+            git push origin HEAD:"$branch" || {
+              echo "Final push failed, will resume next time"
+              exit 1
+            }
           fi
