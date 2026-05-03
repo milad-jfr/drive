@@ -1,0 +1,82 @@
+name: Drive Download + Split + Chunked Push
+
+on:
+  workflow_dispatch:
+    inputs:
+      drive_url:
+        description: "Google Drive direct/download link"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  process-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config http.postBuffer 524288000
+          git config http.maxRequestBuffer 200M
+
+      - name: Install gdown
+        run: pip install gdown
+
+      - name: Download file from Drive
+        run: |
+          echo "Downloading file..."
+          filename=$(gdown "${{ github.event.inputs.drive_url }}" --no-cookies --name) || exit 1
+          echo "Downloaded file named: $filename"
+          ls -lh "$filename"
+
+      - name: Split into chunks <100MB
+        run: |
+          rm -f part_* || true
+          echo "Splitting file..."
+          split -b 90M "$filename" part_
+          echo "Chunks created:"
+          ls -lh part_*
+
+      - name: Stage and push chunks in batches
+        run: |
+          set -e
+          batch_size=30
+          counter=0
+
+          git fetch origin main || git fetch origin master || true
+
+          for file in part_*; do
+            if git ls-tree -r origin/main --name-only | grep -qx "$file"; then
+              echo "Skip already uploaded: $file"
+              continue
+            fi
+
+            git add "$file"
+            counter=$((counter+1))
+
+            if [ $counter -ge $batch_size ]; then
+              git commit -m "Add $counter chunks batch"
+              echo "Pushing batch..."
+              if git push origin HEAD; then
+                echo "Batch OK"
+              else
+                echo "Push failed → resume on next run"
+                exit 1
+              fi
+              counter=0
+            fi
+          done
+
+          if git diff --cached --name-only | grep -q .; then
+            git commit -m "Final batch"
+            git push origin HEAD || echo "Final push failed → will resume next time"
+          fi
