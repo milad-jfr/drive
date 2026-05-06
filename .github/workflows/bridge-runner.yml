@@ -23,40 +23,25 @@ jobs:
           for file in bridge/queue/*.json; do
             echo "Processing $file"
 
-            id=$(jq -r '.id' $file)
-            url=$(jq -r '.url' $file)
+            id=$(jq -r '.id' "$file")
+            url=$(jq -r '.url' "$file")
 
-            # Output file
             outfile="bridge/results/${id}.html"
 
-            # Load the page with JS enabled
-            node <<EOF
-            const fs = require('fs');
-            const { chromium } = require('playwright');
+            node bridge/runner.js "$url" "$outfile"
 
-            (async () => {
-              const browser = await chromium.launch();
-              const page = await browser.newPage();
-              await page.goto("$url", { waitUntil: "networkidle" });
-
-              const html = await page.content();
-              fs.writeFileSync("$outfile", html);
-
-              await browser.close();
-            })();
-EOF
-
-            echo "Saved result: $outfile"
+            echo "Saved $outfile"
           done
 
       - name: Commit results
         run: |
           git config user.email "actions@github.com"
           git config user.name "Bridge Runner"
-          git add bridge/results/
-          git rm bridge/queue/*.json
+
+          git add bridge/results/ || true
+          git rm bridge/queue/*.json || true
+
           git commit -m "Processed requests" || echo "Nothing to commit"
 
       - name: Push results
-        run: |
-          git push
+        run: git push
