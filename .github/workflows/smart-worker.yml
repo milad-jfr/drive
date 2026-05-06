@@ -1,0 +1,63 @@
+name: Smart Worker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+          npm install -g playwright
+          playwright install chromium
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Start Worker Loop
+        shell: bash
+        run: |
+
+          QUEUE_DIR="bridge/queue"
+          RESULT_DIR="bridge/results"
+
+          mkdir -p "$QUEUE_DIR" "$RESULT_DIR"
+
+          echo "🚀 Worker started"
+
+          while true
+          do
+            echo "🔄 Sync repo..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            for file in $QUEUE_DIR/*.json
+            do
+              [ -e "$file" ] || continue
+
+              id=$(jq -r '.id' "$file")
+              url=$(jq -r '.url' "$file")
+              outfile="$RESULT_DIR/$id.html"
+
+              echo "🌐 Processing $url -> $outfile"
+
+              node bridge/worker.js "$url" "$outfile"
+
+              rm "$file"
+              echo "✔️ Done: $outfile"
+            done
+
+            git add bridge || true
+            git commit -m "Worker processed requests" || true
+            git push origin main || true
+
+            sleep 20
+          done
