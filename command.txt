@@ -1,6 +1,7 @@
 ### COMMAND
-nohup python3 -m http.server 8000 --bind 0.0.0.0 >/dev/null 2>&1 &
-ss -tulnp | grep 8000
+nc -vz 64.236.200.106 8000
+curl -v http://64.236.200.106:8000
+
 
 
 ### END
