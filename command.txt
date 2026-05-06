@@ -1,7 +1,6 @@
 ### COMMAND
 
-curl -H "Authorization: Bearer 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" https://api.github.com/milad-jfr
-
+curl -H "Authorization: Bearer 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" https://api.github.com/user
 
 
 
