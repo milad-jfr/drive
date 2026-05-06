@@ -1,5 +1,7 @@
 ### COMMAND
-echo "hello we are here again yohoooooooooooo"
+curl -s ifconfig.io
+ip addr
+
 
 ### END
 
