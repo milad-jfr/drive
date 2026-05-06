@@ -1,0 +1,19 @@
+name: Bridge Runner
+
+on:
+  push:
+    paths:
+      - 'bridge/queue/*.json'
+
+jobs:
+  process:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show queue files
+        run: |
+          ls -la bridge/queue
+          cat bridge/queue/*.json
