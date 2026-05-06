@@ -10,6 +10,9 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      GH_PAT: ${{ secrets.PAT_TOKEN }}
+
     steps:
       - uses: actions/checkout@v4
 
