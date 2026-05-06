@@ -13,7 +13,50 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show queue files
+      - name: Install Playwright
         run: |
-          ls -la bridge/queue
-          cat bridge/queue/*.json
+          npm install -g playwright
+          playwright install chromium
+
+      - name: Process queue files
+        run: |
+          for file in bridge/queue/*.json; do
+            echo "Processing $file"
+
+            id=$(jq -r '.id' $file)
+            url=$(jq -r '.url' $file)
+
+            # Output file
+            outfile="bridge/results/${id}.html"
+
+            # Load the page with JS enabled
+            node <<EOF
+            const fs = require('fs');
+            const { chromium } = require('playwright');
+
+            (async () => {
+              const browser = await chromium.launch();
+              const page = await browser.newPage();
+              await page.goto("$url", { waitUntil: "networkidle" });
+
+              const html = await page.content();
+              fs.writeFileSync("$outfile", html);
+
+              await browser.close();
+            })();
+EOF
+
+            echo "Saved result: $outfile"
+          done
+
+      - name: Commit results
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "Bridge Runner"
+          git add bridge/results/
+          git rm bridge/queue/*.json
+          git commit -m "Processed requests" || echo "Nothing to commit"
+
+      - name: Push results
+        run: |
+          git push
