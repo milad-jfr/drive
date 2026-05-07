@@ -1,4 +1,4 @@
-name: Smart Worker
+name: Smart Worker (Persistent Request Processor)
 
 on:
   workflow_dispatch:
@@ -7,49 +7,67 @@ jobs:
   worker:
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    permissions:
+      contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+      - name: Install Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install Playwright
+      - name: Start Persistent Worker
+        shell: bash
         run: |
-          npm init -y
-          npm install playwright
-          npx playwright install chromium
 
-      - name: Git config
-        run: |
-          git config --global user.name "worker-bot"
-          git config --global user.email "worker@bot.com"
+          REQUEST_FILE="bridge/request.json"
+          RESULT_FILE="bridge/result.json"
+          STATE_FILE=".last_request_hash"
 
-      - name: Start Smart Worker Loop
-        run: |
-          echo "Worker started"
+          mkdir -p bridge
+          touch "$STATE_FILE"
+
+          echo "🚀 Persistent Worker Started..."
 
           while true
           do
-            git fetch origin
-            git reset --hard origin/${{ github.ref_name }}
+            echo "🔄 Syncing repository..."
+            git fetch origin main
+            git reset --hard origin/main
 
-            for file in bridge/queue/*.json; do
-              if [ -f "$file" ]; then
-                echo "Processing $file"
+            if [ -f "$REQUEST_FILE" ]; then
 
-                node bridge/worker.js "$file"
+              current_hash=$(sha256sum "$REQUEST_FILE" | cut -d" " -f1)
+              last_hash=$(cat "$STATE_FILE")
 
-                rm "$file"
+              if [ "$current_hash" != "$last_hash" ]; then
+                echo "⚡ New request detected..."
 
-                git add bridge/results bridge/queue
-                git commit -m "processed job"
-                git push || true
+                echo "$current_hash" > "$STATE_FILE"
+
+                # اجرای worker
+                node bridge/worker.js "$REQUEST_FILE" "$RESULT_FILE"
+
+                git add "$RESULT_FILE" "$STATE_FILE"
+                git commit -m "Update result" || true
+                git push origin main || true
+
+                echo "✅ Request processed."
+              else
+                echo "🌀 No new request."
               fi
-            done
 
+            else
+              echo "📭 No request file found."
+            fi
+
+            echo "⏳ Sleeping 30 seconds..."
             sleep 30
           done
