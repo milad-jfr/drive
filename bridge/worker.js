@@ -1,21 +1,29 @@
-const { chromium } = require("playwright");
-const fs = require("fs");
+import fs from "fs";
+import path from "path";
+import fetch from "node-fetch";
 
-(async () => {
-  const job = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
-  const id = job.id;
-  const url = job.url;
+async function run(job) {
+  const { id, url } = job;
 
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
+  try {
+    const res = await fetch(url);
 
-  await page.goto(url, { waitUntil: "networkidle" });
+    const status = res.status;
+    const headers = Object.fromEntries(res.headers.entries());
+    const body = await res.text();
 
-  const html = await page.content();
+    const outPath = path.join("bridge/results", `${id}.json`);
+    fs.writeFileSync(
+      outPath,
+      JSON.stringify({ status, headers, body }, null, 2)
+    );
 
-  fs.writeFileSync(`bridge/results/${id}.html`, html);
+    console.log("DONE:", id);
+  } catch (err) {
+    console.error("ERROR:", id, err);
+  }
+}
 
-  await browser.close();
-
-  console.log("done:", id);
-})();
+// ورودی JSON را از آرگومان می‌گیرد
+const raw = fs.readFileSync(process.argv[2], "utf8");
+run(JSON.parse(raw));
