@@ -1,0 +1,55 @@
+name: Smart Worker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: |
+          npm init -y
+          npm install playwright
+          npx playwright install chromium
+
+      - name: Git config
+        run: |
+          git config --global user.name "worker-bot"
+          git config --global user.email "worker@bot.com"
+
+      - name: Start Smart Worker Loop
+        run: |
+          echo "Worker started"
+
+          while true
+          do
+            git fetch origin
+            git reset --hard origin/${{ github.ref_name }}
+
+            for file in bridge/queue/*.json; do
+              if [ -f "$file" ]; then
+                echo "Processing $file"
+
+                node bridge/worker.js "$file"
+
+                rm "$file"
+
+                git add bridge/results bridge/queue
+                git commit -m "processed job"
+                git push || true
+              fi
+            done
+
+            sleep 30
+          done
