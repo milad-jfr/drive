@@ -1,29 +1,66 @@
 import fs from "fs";
-import path from "path";
 import fetch from "node-fetch";
 
-async function run(job) {
-  const { id, url } = job;
+async function main() {
+  const [, , requestFile, resultFile] = process.argv;
+
+  if (!requestFile || !resultFile) {
+    console.error("Usage: node bridge/worker.js <request.json> <result.json>");
+    process.exit(1);
+  }
 
   try {
-    const res = await fetch(url);
+    const raw = fs.readFileSync(requestFile, "utf8");
+    const req = JSON.parse(raw);
 
-    const status = res.status;
-    const headers = Object.fromEntries(res.headers.entries());
-    const body = await res.text();
+    const url = req.url;
+    if (!url) {
+      fs.writeFileSync(
+        resultFile,
+        JSON.stringify(
+          {
+            error: "Missing 'url' in request.json"
+          },
+          null,
+          2
+        )
+      );
+      return;
+    }
 
-    const outPath = path.join("bridge/results", `${id}.json`);
-    fs.writeFileSync(
-      outPath,
-      JSON.stringify({ status, headers, body }, null, 2)
-    );
+    console.log(`🌐 Fetching: ${url}`);
 
-    console.log("DONE:", id);
+    const response = await fetch(url);
+
+    const headers = {};
+    response.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+
+    const body = await response.text();
+
+    const result = {
+      id: req.id || null,
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+      body
+    };
+
+    fs.writeFileSync(resultFile, JSON.stringify(result, null, 2));
+    console.log(`✅ Result written to ${resultFile}`);
   } catch (err) {
-    console.error("ERROR:", id, err);
+    const errorResult = {
+      error: err?.message || String(err)
+    };
+
+    try {
+      fs.writeFileSync(resultFile, JSON.stringify(errorResult, null, 2));
+    } catch (_) {}
+
+    console.error("❌ Worker error:", err);
   }
 }
 
-// ورودی JSON را از آرگومان می‌گیرد
-const raw = fs.readFileSync(process.argv[2], "utf8");
-run(JSON.parse(raw));
+main();
