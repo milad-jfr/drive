@@ -1,13 +1,14 @@
 {
-  "id": "d46518c9-32c8-435a-ab35-d6bb0a59a4c9",
-  "url": "https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=YouTube+Sans:wght@300..900&display=swap",
+  "id": "20b2fdf8-f91d-4981-873f-bd6f2b4a286f",
+  "url": "https://www.youtube.com/s/_/ytmainappweb/_/js/k=ytmainappweb.kevlar_base.en_US.H6w3EUqm5ak.es5.O/am=AAAAQAAAEEg/d=1/br=1/rs=AGKMywFYUiIOzOpDNWnDY5iNQZxhur9I0g/m=kevlar_base_module,kevlar_main_module,kevlar_base_sync_mod_chunk",
   "method": "GET",
   "headers": {
-    "accept": "text/css,*/*;q=0.1",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://fonts.googleapis.com/",
+    "referer": "https://www.youtube.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "fonts.googleapis.com"
+    "cookie": "__Secure-YNID=18.YT=i5I66Ych3bJmpn5Z65TIN0xjWgKMrh7IfzX6Epn-9wZQvGUDUAXUavz5fa_5AoGtpH5zA30_Frhz_R7JdJDyIgGwh7BY1R21TNkpSKckl-vNQ2BjF46rVqxErXl8XNPQnYvwbLeqb2IRPE0tFWqAso1hM38R1hDNKU2KlAozTUTsi2IBR9vz59ThBWrGLAAzsaO-7TmgoYpKBQqcayzPKFQkMv2mk0YEZC2toMeik9B6WN08SeOOfyEVEHZ0gko04RdwBw50UuXmZC4NNGPKJjaKwo5U7sLqQEair-B_Stn0vfXDDFIuxLE_fHDEjfkebrK9eYbEfhi8CmOPa9NNmg; GPS=1; YSC=63CT3IqNV6Q; __Secure-ROLLOUT_TOKEN=CKSg-pjInp3OqQEQ24WU8aKylAMY24WU8aKylAM%3D; __Secure-YEC=; VISITOR_INFO1_LIVE=ZacD_JO2-0k; VISITOR_PRIVACY_METADATA=CgJVUxIEGgAgaA%3D%3D",
+    "host": "www.youtube.com"
   },
   "body": "",
   "bodyEncoding": "base64"
