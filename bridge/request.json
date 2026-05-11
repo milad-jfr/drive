@@ -1,14 +1,17 @@
 {
-  "id": "4d9f0cc7-c128-4cd9-b865-d6126c3379eb",
-  "url": "https://www.gstatic.com/og/_/ss/k=og.asy.4IC_VzjRsKk.L.W.O/m=ll_tdm,adcgm3,ll_fw,abld/excm=/d=1/ed=1/ct=zgms/rs=AA2YrTtOwGixO9cCWuYjA4zyo-8VWP03SQ",
-  "method": "GET",
+  "id": "b965d484-1f52-47ac-a4d3-b8fd3a7e9630",
+  "url": "https://play.google.com/log?format=json&hasfast=true",
+  "method": "POST",
   "headers": {
-    "accept": "text/css,*/*;q=0.1",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://www.gstatic.com/",
+    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "origin": "https://play.google.com",
+    "referer": "https://play.google.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "www.gstatic.com"
+    "cookie": "NID=531=Iw4q_gtzuFLYOaXu-hW6nJrSLVmwboo1A-tuBW9RDnjXJgMBONtqmjQFarkgXN04O5jRPPkfZn0r3Gs4J6NjXhcBCnl9m_vLC1FYPEcLP8E_cir2Pl2y0HJJ-dTfFFslndHpXCkTuABdnawQEdUaXPLxIpTdd3ijHYlAWuREr75rXdBogrEPYa3UkcnlcPtu5AEtaArX1wc",
+    "host": "play.google.com"
   },
-  "body": "",
+  "body": "W1sxLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLFtudWxsLG51bGwsbnVsbCxudWxsLCJlbiIsbnVsbCxudWxsLG51bGwsW1tbIkdvb2dsZSBDaHJvbWUiLCIxNDciXSxbIk5vdC5BL0JyYW5kIiwiOCJdLFsiQ2hyb21pdW0iLCIxNDciXV0sMCwiTGludXgiLCIiLCJ4ODYiLCIiLCIxNDcuMC43NzI3LjEzNyJdLFsxLDBdXV0sMzczLFtbMTc3ODUzODI4OTcwNCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCwiWzEsNDA0MDAsNTM4LG51bGwsXCI5MTMxOTMyNTYuMFwiLFwiTmxjQ2FyYm5LcDZJMFBFUGk4N1A4UXdcIixudWxsLG51bGwsbnVsbCxcImVuXCIsXCJVU0FcIiwwLDE5LDE0NzIxLG51bGwsMCwwLG51bGwsXCJvZy01MTM0MTZmMC04MzE4LTQwNGMtYjM1MC00ZDg3YjVkZTBmMjJcIixudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCwxLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLDEsbnVsbCxudWxsLG51bGwsMCxudWxsLFsyLDUsXCJwd1wiLDMwXSxudWxsLG51bGwsbnVsbCxudWxsLDEsbnVsbCwxXSIsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsLTEyNjAwLFtudWxsLG51bGwsbnVsbCwiW251bGwsbnVsbCxbMzcwMDk0OSwzNzAxMzg0LDEwMjc3MjU0NiwxMTYxMTk4MjUsMTE2MjQ5MDQwLDExNjI0OTA0M11dIl0sbnVsbCxudWxsLG51bGwsbnVsbCwxXV0sMTc3ODUzODI5MDcwNSxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLFtbbnVsbCxbbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsMTIyNTA1Njk1XV0sOV1d",
   "bodyEncoding": "base64"
 }
