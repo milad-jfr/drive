@@ -1,14 +1,13 @@
 {
-  "id": "3bf93dbf-3aa5-400b-b77b-8b69811406b1",
-  "url": "https://www.google.com/xjs/_/ss/k=xjs.hd.jHo6dVbgp64.L.B1.O/am=AAAiBAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAEAAAAAAAAAAAIAAAIAaRAAAAgAAAAAACD0AAEADAAAAAAAAAAgAAAAAAEAAAAAAAQAAAAAAACAAAAAAAAAAAEAAAAAAAAAEAAQQAQAABCgAAAAAAAgAAAAAAAAAAAABAAAAAAAAAAAAIAAAAAAAAAZAGAAEAAAAAAgDAAAAAAAAAAAAAAAAAAAAAAACJAABABAwAAAAAAABAAAAAAABAIQQBIAABRAAAAAAAAAIAAAAAACBgAAAAAAAAAACAAGBEEAAAAAAAgAQAAQACAAgIAAAjKABAEgUCAAAQgcAAAQAAAAAIAAAAAAAAAAAAAAAgBEAAAAAAAAWAB4KgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKA/d=1/ed=1/br=1/rs=ACT90oH1wzwCJy-Csb4n2wNAymouGC7xnw/m=cdos,hsm,jsa,mb4ZUb,cEt90b,SNUn3,qddgKe,sTsDMc,dtl0hd,eHDfl,YV5bee,d,csi",
+  "id": "b12202d9-d8e6-45f0-84e1-ec6f8a44f107",
+  "url": "https://www.gstatic.com/og/_/js/k=og.asy.en_US.ZTFfd0_GMqE.2019.O/rt=j/m=_ac,_awd,ada,lldp,qads,abld/exm=/d=1/ed=1/rs=AA2YrTtLXoys3Rg2wAJFxAA9UrajU-uuvQ",
   "method": "GET",
   "headers": {
-    "accept": "text/css,*/*;q=0.1",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://www.google.com/",
+    "referer": "https://www.gstatic.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "cookie": "__Secure-STRP=AEEP7gJET0qxSTi6tV-vere7-Mo7IXKHUgisqtvtUIXNOrBEsqBA0ZpbhBSUJ3HviFFoLB_oSsBAzwCxWOSqXMYS7oBWNv392e-j; AEC=AaJma5t6JgvIqigetHh9a0mqxqY331oyKHbhMPZ6zUMtZlXzsvVj2npRfPQ; NID=531=fMlN6dfJ1G0sn3odNzTQIs2B2JlDj5BC_tVNhj8AoTHZ1iuuCZXZvuEXyZvMsb8OZguhOsM2HEFYfPez_O2osKpzv8EY_JHeu4MERUeClQfKlZOU1VRqaqaIGaLHoTTLSuJwLoGeka0MPe8bY21Iy-v-RbLypHhAYGcbAfJrwkIm1a89hIb2JkULrwc8QBxttABl65Kg_Vv6ivtcZwxemEz_L5Jx0rrlcEmNfqo; __Secure-BUCKET=COAD",
-    "host": "www.google.com"
+    "host": "www.gstatic.com"
   },
   "body": "",
   "bodyEncoding": "base64"
