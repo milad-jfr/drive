@@ -1,16 +1,14 @@
 {
-  "id": "ceb76e21-be50-40ce-9e0b-68489e423aac",
-  "url": "https://play.google.com/log?format=json&hasfast=true",
-  "method": "POST",
+  "id": "3c819996-b88d-4383-8f25-72b07eff0369",
+  "url": "https://youtube.com",
+  "method": "GET",
   "headers": {
-    "accept": "*/*",
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "accept-language": "en-US,en;q=0.9",
-    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-    "origin": "https://play.google.com",
-    "referer": "https://play.google.com/",
+    "referer": "https://youtube.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "play.google.com"
+    "host": "youtube.com"
   },
-  "body": "W1sxLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLFtudWxsLG51bGwsbnVsbCxudWxsLCJlbiIsbnVsbCxudWxsLG51bGwsW1tbIkdvb2dsZSBDaHJvbWUiLCIxNDciXSxbIk5vdC5BL0JyYW5kIiwiOCJdLFsiQ2hyb21pdW0iLCIxNDciXV0sMCwiTGludXgiLCIiLCJ4ODYiLCIiLCIxNDcuMC43NzI3LjEzNyJdLFsxLDBdXV0sMzczLFtbMTc3ODUzODA4MzgyMSxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCwiWzEsNDA0MDAsNTM4LG51bGwsXCI5MTMxOTMyNTYuMFwiLFwiWWxZQ2FvVzVJWXZHMFBFUGktWFAyQWdcIixudWxsLG51bGwsbnVsbCxcImVuXCIsXCJVU0FcIiwwLDE5LDIyNTk3LG51bGwsMCwwLG51bGwsXCJvZy0wMzQ2NGQ4NS01NjRhLTQ3YTUtYTg3NS1lZTIxNTRjMWNiZTBcIixudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCwxLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLDEsbnVsbCxudWxsLG51bGwsMCxudWxsLFsyLDUsXCJwd1wiLDE4MF0sbnVsbCxudWxsLG51bGwsbnVsbCwxLG51bGwsMV0iLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLC0xMjYwMCxbbnVsbCxudWxsLG51bGwsIltudWxsLG51bGwsWzM3MDA5NDksMzcwMTM4NCwxMDI3NzI1NDYsMTE2MTE5ODI1LDExNjI0OTA0MCwxMTYyNDkwNDNdXSJdLG51bGwsbnVsbCxudWxsLG51bGwsMV1dLDE3Nzg1MzgwODUyNTMsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxbW251bGwsW251bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLDEyMjUwNTY5NV1dLDldXQ==",
+  "body": "",
   "bodyEncoding": "base64"
 }
