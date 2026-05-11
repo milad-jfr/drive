@@ -1,13 +1,13 @@
 {
-  "id": "071abee7-998f-474a-8df1-ef0371ac18a5",
-  "url": "https://s.yimg.com/ss/analytics-3.78.3.js",
+  "id": "25e3b2db-4e53-45cf-b2cc-40e26e5a677d",
+  "url": "https://securepubads.g.doubleclick.net/tag/js/gpt.js",
   "method": "GET",
   "headers": {
     "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://s.yimg.com/",
+    "referer": "https://securepubads.g.doubleclick.net/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "s.yimg.com"
+    "host": "securepubads.g.doubleclick.net"
   },
   "body": "",
   "bodyEncoding": "base64"
