@@ -1,14 +1,14 @@
 {
-  "id": "7026f097-b1d3-46a4-8bf4-fc9f49b04838",
-  "url": "https://www.google.com/xjs/_/ss/k=xjs.hd.jHo6dVbgp64.L.B1.O/am=AAAiBAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAEAAAAAAAAAAAIAAAIAaRAAAAgAAAAAACD0AAEADAAAAAAAAAAgAAAAAAEAAAAAAAQAAAAAAACAAAAAAAAAAAEAAAAAAAAAEAAQQAQAABCgAAAAAAAgAAAAAAAAAAAABAAAAAAAAAAAAIAAAAAAAAAZAGAAEAAAAAAgDAAAAAAAAAAAAAAAAAAAAAAACJAABABAwAAAAAAABAAAAAAABAIQQBIAABRAAAAAAAAAIAAAAAACBgAAAAAAAAAACAAGBEEAAAAAAAgAQAAQACAAgIAAAjKABAEgUCAAAQgcAAAQAAAAAIAAAAAAAAAAAAAAAgBEAAAAAAAAWAB4KgQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKA/d=1/ed=1/br=1/rs=ACT90oH1wzwCJy-Csb4n2wNAymouGC7xnw/m=cdos,hsm,jsa,mb4ZUb,cEt90b,SNUn3,qddgKe,sTsDMc,dtl0hd,eHDfl,YV5bee,d,csi",
+  "id": "160febc5-fa75-4951-9d98-a31e8b5fce75",
+  "url": "https://fonts.gstatic.com/s/googlesans/v29/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2",
   "method": "GET",
   "headers": {
-    "accept": "text/css,*/*;q=0.1",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://www.google.com/",
+    "origin": "https://fonts.gstatic.com",
+    "referer": "https://fonts.gstatic.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "cookie": "__Secure-STRP=AEEP7gJ1iLoOflhVdBGpCtZjGQzsmhZOT0EJSrU7dJwhJBb2QKfrHH6WFzzV83YD_0igsNG6Y7yp4WoZDML8SnqfRJsyuTx-z0a-; AEC=AaJma5sIwSZ-Wmrv3Or4QryFFwL0dRhpn0IIqJhW7E83SfjWyEs7Z213wQ; NID=531=CjMTH_EzIXVCc4RIganRqsg0u-bpxNB8vAMiAWPYC3d03PCfQOI0niaocQ-euNLdBf3c408uDzAUyesNPOlp_YA1Zwa7sW9uJtcBR9Qf92fc1s9ACxjZPgadC0-xMv8v0D7SAVRb1PIJ7fI-91SNYkxWbF_uQbn1nRm2fUM0-HvuxkDTFTKOQEEFj7tuITibRZrXPfBxLraOJRBEgC5G1b3tt8HFC3P4JSf9KkbW; __Secure-BUCKET=CFY",
-    "host": "www.google.com"
+    "host": "fonts.gstatic.com"
   },
   "body": "",
   "bodyEncoding": "base64"
