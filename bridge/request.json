@@ -1,9 +1,9 @@
 {
-  "id": "9041ab00-f9f6-47d6-bc72-7d282a3f59ab",
-  "url": "https://www.youtube.com/s/desktop/14cba078/cssbin/www-main-desktop-watch-page-skeleton.css",
+  "id": "97d05a81-c41c-4d7c-973e-02bf090d2700",
+  "url": "https://www.youtube.com/s/desktop/14cba078/jsbin/scheduler.vflset/scheduler.js",
   "method": "GET",
   "headers": {
-    "accept": "text/css,*/*;q=0.1",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
     "referer": "https://www.youtube.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
