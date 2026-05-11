@@ -1,15 +1,16 @@
 {
-  "id": "0836ff5c-352d-46d3-b68e-a9bc036fcf3e",
-  "url": "https://fonts.gstatic.com/s/roboto/v18/KFOlCnqEu92Fr1MmWUlfBBc4.woff2",
-  "method": "GET",
+  "id": "91a0eba9-2774-4781-ad8d-aab27b4372e2",
+  "url": "https://play.google.com/log?format=json&hasfast=true",
+  "method": "POST",
   "headers": {
     "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "origin": "https://fonts.gstatic.com",
-    "referer": "https://fonts.gstatic.com/",
+    "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
+    "origin": "https://play.google.com",
+    "referer": "https://play.google.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "fonts.gstatic.com"
+    "host": "play.google.com"
   },
-  "body": "",
+  "body": "W1sxLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLFtudWxsLG51bGwsbnVsbCxudWxsLCJlbiIsbnVsbCxudWxsLG51bGwsW1tbIkdvb2dsZSBDaHJvbWUiLCIxNDciXSxbIk5vdC5BL0JyYW5kIiwiOCJdLFsiQ2hyb21pdW0iLCIxNDciXV0sMCwiTGludXgiLCIiLCJ4ODYiLCIiLCIxNDcuMC43NzI3LjEzNyJdLFsxLDAsM11dXSwzNzMsW1sxNzc4NTM4MjQ5NDE0LG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLCJbMSw0MDQwMCw1MzgsbnVsbCxcIjkxMzE5MzI1Ni4wXCIsXCI4MVlDYXJ5dEZPUGZrUElQejZETXNRa1wiLG51bGwsbnVsbCxudWxsLFwiZW5cIixcIlVTQVwiLDAsMTksNDEwMTUsbnVsbCwwLDAsbnVsbCxcIm9nLWVmZWYzMzE0LTg3MGUtNDNjYi04ZjM4LWMwMGVmZjQ3MzQxMVwiLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLDEsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsMSxudWxsLG51bGwsbnVsbCwwLG51bGwsWzIsNSxcImR6XCIsMTQyXSxudWxsLG51bGwsbnVsbCxudWxsLDEsbnVsbCwxXSIsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsLTEyNjAwLFtudWxsLG51bGwsbnVsbCwiW251bGwsbnVsbCxbMzcwMDk0OSwzNzAxMzg0LDEwMjc3MjU0NiwxMTYxMTk4MjUsMTE2MjQ5MDQwLDExNjI0OTA0M11dIl0sbnVsbCxudWxsLG51bGwsbnVsbCwxXV0sMTc3ODUzODI2NDY2OSxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLFtbbnVsbCxbbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsbnVsbCxudWxsLG51bGwsMTIyNTA1Njk1XV0sOV1d",
   "bodyEncoding": "base64"
 }
