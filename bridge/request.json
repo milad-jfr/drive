@@ -1,9 +1,9 @@
 {
-  "id": "20b2fdf8-f91d-4981-873f-bd6f2b4a286f",
-  "url": "https://www.youtube.com/s/_/ytmainappweb/_/js/k=ytmainappweb.kevlar_base.en_US.H6w3EUqm5ak.es5.O/am=AAAAQAAAEEg/d=1/br=1/rs=AGKMywFYUiIOzOpDNWnDY5iNQZxhur9I0g/m=kevlar_base_module,kevlar_main_module,kevlar_base_sync_mod_chunk",
+  "id": "8b50ee2e-2187-4699-852f-bc5ed602e982",
+  "url": "https://www.youtube.com/s/desktop/14cba078/cssbin/www-main-desktop-home-page-skeleton.css",
   "method": "GET",
   "headers": {
-    "accept": "*/*",
+    "accept": "text/css,*/*;q=0.1",
     "accept-language": "en-US,en;q=0.9",
     "referer": "https://www.youtube.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
