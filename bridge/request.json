@@ -1,14 +1,13 @@
 {
-  "id": "724a6ad5-7566-4d33-b26e-1b0d420aded6",
-  "url": "https://s.yimg.com/eh/prebid-config/fp-us-desktop.json?v=20585",
+  "id": "29a7bb96-b991-44e7-84f3-d875a0b79d1b",
+  "url": "https://cdn.taboola.com/libtrc/yahooweb-network/loader.js",
   "method": "GET",
   "headers": {
     "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "origin": "https://s.yimg.com",
-    "referer": "https://s.yimg.com/",
+    "referer": "https://cdn.taboola.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "s.yimg.com"
+    "host": "cdn.taboola.com"
   },
   "body": "",
   "bodyEncoding": "base64"
