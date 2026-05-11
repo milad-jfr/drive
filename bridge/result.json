@@ -1,0 +1,26 @@
+{
+  "id": "b965d484-1f52-47ac-a4d3-b8fd3a7e9630",
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "access-control-allow-credentials": "true",
+    "access-control-allow-headers": "X-Playlog-Web",
+    "access-control-allow-origin": "https://play.google.com",
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "cache-control": "private",
+    "content-encoding": "gzip",
+    "content-type": "text/plain; charset=UTF-8",
+    "cross-origin-resource-policy": "cross-origin",
+    "date": "Mon, 11 May 2026 22:25:08 GMT",
+    "expires": "Mon, 11 May 2026 22:25:08 GMT",
+    "p3p": "CP=\"This is not a P3P policy! See g.co/p3phelp for more info.\"",
+    "server": "Playlog",
+    "set-cookie": "NID=531=J39moo3FVaNRo6fL7CAMAePhqaSa6q-PTSo8ZIiq61mJhJ6bpZU7uYuRIzuQGJcgVFBqcYiM_b7Kd8Ijs5JJ1rQE7v8z_bIzWneBHOLu_M7H0kcuyx_r4YU8V-MYDUwXjMfkpu7TlwAM3VUIya2GyB8r23eL0a0Yu08RBmZIWc8HoHFN2wt5jER9LiNpG7coGNygC_ZmDsA; expires=Tue, 10-Nov-2026 22:24:42 GMT; path=/; domain=.google.com; Secure; HttpOnly; SameSite=none",
+    "transfer-encoding": "chunked",
+    "x-frame-options": "SAMEORIGIN",
+    "x-xss-protection": "0"
+  },
+  "body": "[\"-1\",null,[[[\"ANDROID_BACKUP\",0],[\"BATTERY_STATS\",0],[\"SMART_SETUP\",0],[\"TRON\",0]],-3334737594024971225],[],{\"175237375\":[10000]}]",
+  "bodyEncoding": "utf8",
+  "finalUrl": "https://play.google.com/log?format=json&hasfast=true"
+}
