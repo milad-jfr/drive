@@ -1,12 +1,12 @@
 {
-  "id": "7d34d2ce-deb4-429c-9ad4-c13c6c3e4218",
-  "url": "facebook.com",
+  "id": "70a048b5-55a2-4396-88d0-26332a980f4b",
+  "url": "https://example.com",
   "method": "GET",
   "headers": {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "http://localhost:8080/?url=https://facebook.com",
-    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+    "host": "example.com"
   },
   "body": "",
   "bodyEncoding": "base64"
