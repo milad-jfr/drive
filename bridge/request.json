@@ -1,13 +1,13 @@
 {
-  "id": "3c819996-b88d-4383-8f25-72b07eff0369",
-  "url": "https://youtube.com",
+  "id": "560429be-1723-4ef0-abbb-1533dbe9521c",
+  "url": "https://i.ytimg.com/generate_204",
   "method": "GET",
   "headers": {
-    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://youtube.com/",
+    "referer": "https://i.ytimg.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "youtube.com"
+    "host": "i.ytimg.com"
   },
   "body": "",
   "bodyEncoding": "base64"
