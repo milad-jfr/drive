@@ -1,0 +1,15 @@
+{
+  "id": "560429be-1723-4ef0-abbb-1533dbe9521c",
+  "status": 204,
+  "statusText": "No Content",
+  "headers": {
+    "alt-svc": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000",
+    "content-length": "0",
+    "cross-origin-resource-policy": "cross-origin",
+    "date": "Mon, 11 May 2026 22:22:39 GMT",
+    "x-body-encoding": "base64"
+  },
+  "body": "",
+  "bodyEncoding": "base64",
+  "finalUrl": "https://i.ytimg.com/generate_204"
+}
