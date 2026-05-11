@@ -1,9 +1,9 @@
 {
-  "id": "d15951da-c33d-4bb6-bff5-de928bc70008",
-  "url": "https://s.yimg.com/uu/api/res/1.2/VR2qKscXOMICZ36W3cPYjg--~B/Zmk9c3RyaW07aD02MjA7cT05NTt3PTExMDQ7YXBwaWQ9eXRhY2h5b24-/https://s.yimg.com/os/creatr-uploaded-images/2026-05/29489870-4d72-11f1-bae7-d8acfa881dde.cf.webp",
+  "id": "071abee7-998f-474a-8df1-ef0371ac18a5",
+  "url": "https://s.yimg.com/ss/analytics-3.78.3.js",
   "method": "GET",
   "headers": {
-    "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
     "referer": "https://s.yimg.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
