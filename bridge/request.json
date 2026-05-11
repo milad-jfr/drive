@@ -1,13 +1,13 @@
 {
-  "id": "560429be-1723-4ef0-abbb-1533dbe9521c",
-  "url": "https://i.ytimg.com/generate_204",
+  "id": "d46518c9-32c8-435a-ab35-d6bb0a59a4c9",
+  "url": "https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=YouTube+Sans:wght@300..900&display=swap",
   "method": "GET",
   "headers": {
-    "accept": "*/*",
+    "accept": "text/css,*/*;q=0.1",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://i.ytimg.com/",
+    "referer": "https://fonts.googleapis.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "i.ytimg.com"
+    "host": "fonts.googleapis.com"
   },
   "body": "",
   "bodyEncoding": "base64"
