@@ -51,27 +51,32 @@ jobs:
 
             if [ -f "$REQUEST_FILE" ]; then
               current_hash=$(sha256sum "$REQUEST_FILE" | cut -d" " -f1)
-              last_hash=$(cat "$STATE_FILE" 2>/dev/null)
+              last_hash=$(cat "$STATE_FILE" 2>/dev/null || echo "")
 
               if [ "$current_hash" != "$last_hash" ]; then
                 echo "⚡ New request detected..."
 
                 echo "$current_hash" > "$STATE_FILE"
 
+                # اجرای worker
                 node bridge/worker.js "$REQUEST_FILE" "$RESULT_FILE" || echo "⚠️ Worker execution failed"
 
+                # بعد از پردازش، request را پاک کن تا برای درخواست بعدی آماده شود
+                rm -f "$REQUEST_FILE"
+
+                # commit فقط result و state
                 git add "$RESULT_FILE" "$STATE_FILE" || echo "⚠️ git add failed"
                 git commit -m "Update result" || echo "ℹ️ Nothing to commit"
                 git push origin main || echo "⚠️ git push failed"
 
                 echo "✅ Request processed."
               else
-                echo "🌀 No new request."
+                echo "🌀 No new request (hash unchanged)."
               fi
             else
               echo "📭 No request file found."
             fi
 
-            echo "⏳ Sleeping 30 seconds..."
-            sleep 30
+            echo "⏳ Sleeping 5 seconds..."
+            sleep 5
           done
