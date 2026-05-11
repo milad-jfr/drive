@@ -1,10 +1,11 @@
 {
-  "id": "b8cfea5f-52df-4236-ac35-d2c02f6729e6",
-  "url": "https://s.yimg.com/aaq/prebid/prebid-current.js",
+  "id": "724a6ad5-7566-4d33-b26e-1b0d420aded6",
+  "url": "https://s.yimg.com/eh/prebid-config/fp-us-desktop.json?v=20585",
   "method": "GET",
   "headers": {
     "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
+    "origin": "https://s.yimg.com",
     "referer": "https://s.yimg.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
     "host": "s.yimg.com"
