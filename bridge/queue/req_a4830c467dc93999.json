@@ -1,0 +1,12 @@
+{
+  "id": "a4830c467dc93999",
+  "url": "https://www.gstatic.com/images/branding/searchlogo/ico/favicon.ico",
+  "method": "GET",
+  "headers": {
+    "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+    "accept-language": "en-US,en;q=0.9",
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+  },
+  "body": null,
+  "bodyEncoding": null
+}
