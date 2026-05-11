@@ -1,3 +1,4 @@
+// bridge/worker.js
 import fs from "fs";
 import fetch from "node-fetch";
 
@@ -10,6 +11,11 @@ async function main() {
   }
 
   try {
+    if (!fs.existsSync(requestFile)) {
+      console.error(`Request file not found: ${requestFile}`);
+      process.exit(0);
+    }
+
     const raw = fs.readFileSync(requestFile, "utf8");
     const req = JSON.parse(raw);
 
@@ -19,6 +25,7 @@ async function main() {
         resultFile,
         JSON.stringify(
           {
+            id: req.id || null,
             error: "Missing 'url' in request.json"
           },
           null,
@@ -34,7 +41,7 @@ async function main() {
 
     const headers = {};
     response.headers.forEach((value, key) => {
-      headers[key] = value;
+      headers[key.toLowerCase()] = value;
     });
 
     const body = await response.text();
@@ -57,7 +64,9 @@ async function main() {
 
     try {
       fs.writeFileSync(resultFile, JSON.stringify(errorResult, null, 2));
-    } catch (_) {}
+    } catch (_) {
+      // ignore
+    }
 
     console.error("❌ Worker error:", err);
   }
