@@ -1,13 +1,13 @@
 {
-  "id": "29a7bb96-b991-44e7-84f3-d875a0b79d1b",
-  "url": "https://cdn.taboola.com/libtrc/yahooweb-network/loader.js",
+  "id": "5425020b-ac13-4bb9-a4f4-fe6dce23000a",
+  "url": "https://s.yimg.com/lo/mysterio/api/A11BDCF18B4CABF8B1122E57DDE3E5930B810A2F2E544372FA79846D8C250A0D/subgraphmysterio/smartcrop_w124_h124_faces;quality_90/https:%2F%2Fd29szjachogqwa.cloudfront.net%2Fimages%2Fuser-uploaded%2Fthumb-the-late-show-colbert_2732.jpg",
   "method": "GET",
   "headers": {
-    "accept": "*/*",
+    "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://cdn.taboola.com/",
+    "referer": "https://s.yimg.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "cdn.taboola.com"
+    "host": "s.yimg.com"
   },
   "body": "",
   "bodyEncoding": "base64"
