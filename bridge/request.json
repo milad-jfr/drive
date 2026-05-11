@@ -1,13 +1,14 @@
 {
-  "id": "0782d9c3-b91d-47b3-bbec-c5149a5b1d4a",
-  "url": "https://s.yimg.com/lo/mysterio/api/BD34F941B6A827D138FC1D3911658E64308F2E3998579821A28C4333FEB13CA2/subgraphmysterio/smartcrop_w124_h124_faces;quality_90/https:%2F%2Fmedia.zenfs.com%2Fen%2Freuters.com%2F3b3844d371d677cff0e2da337da49bd2",
+  "id": "4422d2d8-7cd9-4618-88b3-388150cb6a2f",
+  "url": "https://www.yahoo.com/_nca/_next/static/chunks/webpack-70712083b1a33e60.js?dpl=sha-b00d39a",
   "method": "GET",
   "headers": {
-    "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+    "accept": "*/*",
     "accept-language": "en-US,en;q=0.9",
-    "referer": "https://s.yimg.com/",
+    "referer": "https://www.yahoo.com/",
     "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
-    "host": "s.yimg.com"
+    "cookie": "AWSALBTG=EHBOO1Q8+fSz1CcPWxwKdqEBG99B+mY2LbjsKSZiSceyuJxv6AyGIf/P3ONIhkFMPy3eBxCqeIHtWap23FKQ6hbfODsTxxGKpuuOV/07rXVa1zRgc2m9s7WmaZldLNafTNlpeDANrT9PY4EsTiwf+m3SmZHgt3qNCi4ZR/EW+SGl; AWSALBTGCORS=EHBOO1Q8+fSz1CcPWxwKdqEBG99B+mY2LbjsKSZiSceyuJxv6AyGIf/P3ONIhkFMPy3eBxCqeIHtWap23FKQ6hbfODsTxxGKpuuOV/07rXVa1zRgc2m9s7WmaZldLNafTNlpeDANrT9PY4EsTiwf+m3SmZHgt3qNCi4ZR/EW+SGl; A1=d=AQABBCtVAmoCEJIvSZnFZt5Bd_ol299OvskFEgEBAQGmA2oMatwr0iMA_eMDAA&S=AQAAAi4oGMNV75tOiVVFbAgkzlM; A3=d=AQABBCtVAmoCEJIvSZnFZt5Bd_ol299OvskFEgEBAQGmA2oMatwr0iMA_eMDAA&S=AQAAAi4oGMNV75tOiVVFbAgkzlM; A1S=d=AQABBCtVAmoCEJIvSZnFZt5Bd_ol299OvskFEgEBAQGmA2oMatwr0iMA_eMDAA&S=AQAAAi4oGMNV75tOiVVFbAgkzlM",
+    "host": "www.yahoo.com"
   },
   "body": "",
   "bodyEncoding": "base64"
