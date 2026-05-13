@@ -1,3 +1,3 @@
 ### COMMAND
-sudo apt install ppp -y
+pppd --version
 ### END
