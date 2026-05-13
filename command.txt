@@ -1,3 +1,7 @@
 ### COMMAND
-sudo pppd --version
+mkdir -p ~/ppp-test
+cd ~/ppp-test
+
+mkfifo in.pipe
+mkfifo out.pipe
 ### END
