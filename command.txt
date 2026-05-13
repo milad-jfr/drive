@@ -1,4 +1,9 @@
 ### COMMAND
-ls -l
+cd ~/ppp-test
+
+pppd nodetach noauth passive \
+10.0.0.2:10.0.0.1 \
+< in.pipe > out.pipe
+
 
 ### END
