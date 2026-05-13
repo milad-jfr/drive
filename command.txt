@@ -1,7 +1,4 @@
 ### COMMAND
-mkdir -p ~/ppp-test
-cd ~/ppp-test
+ls -l
 
-mkfifo in.pipe
-mkfifo out.pipe
 ### END
