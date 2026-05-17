@@ -1,6 +1,5 @@
 ### COMMAND
 
-"$HOME/.local/bin/skirk" setup init --out skirk-kit --reset-google-login
-
+1
 
 ### END
