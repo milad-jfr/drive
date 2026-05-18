@@ -1,4 +1,4 @@
-name: Web Terminal no-SSH
+name: Web Terminal via localhost.run
 
 on:
   workflow_dispatch:
@@ -9,24 +9,20 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Install Web Terminal (shellinabox)
+      - name: Install ttyd
         run: |
           sudo apt update
-          sudo apt install -y shellinabox
-          sudo sed -i 's/4200/8080/' /etc/default/shellinabox
-          sudo systemctl restart shellinabox
+          sudo apt install -y ttyd
 
-      - name: Get runner IP
-        id: ip
+      - name: Start web terminal
         run: |
-          IP=$(curl -s ifconfig.me || curl -s https://api.ipify.org)
-          echo "runner_ip=$IP" >> $GITHUB_OUTPUT
+          ttyd -p 7681 bash &
 
-      - name: Show access URL
+      - name: Expose via localhost.run
         run: |
-          echo "Open this in your browser:"
-          echo "https://${{ steps.ip.outputs.runner_ip }}:8080"
-
+          echo "Creating public tunnel..."
+          ssh -o StrictHostKeyChecking=no -R 80:localhost:7681 ssh.localhost.run
+          
       - name: Keep alive
         run: |
           while true; do sleep 300; done
