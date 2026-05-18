@@ -1,6 +1,8 @@
 ### COMMAND
 
-printf "2\n" | "$HOME/.local/bin/skirk" setup init --out skirk-kit --reset-google-login
+curl -fsSL https://raw.githubusercontent.com/ShahabSL/Skirk/main/install.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+"$HOME/.local/bin/skirk" version
 
 
 ### END
