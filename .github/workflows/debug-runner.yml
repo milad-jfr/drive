@@ -1,27 +1,28 @@
-name: Web Terminal
+name: SSH Debug Runner
 
 on:
   workflow_dispatch:
 
 jobs:
-  debug:
+  ssh:
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
     steps:
-      - name: Install ttyd
+      - name: Update system
         run: |
           sudo apt update
-          sudo apt install -y ttyd
+          sudo apt install -y curl
 
-      - name: Start terminal
-        run: |
-          ttyd -p 9000 -W bash &
+      - name: Start SSH via tmate
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          detached: false
 
-      - name: Create tunnel
+      - name: Keep runner alive
         run: |
-          ssh -p 443 -o StrictHostKeyChecking=no -R0:localhost:9000 a.pinggy.io
-          
-      - name: Keep alive
-        run: |
-          while true; do sleep 300; done
+          echo "Runner is alive"
+          while true; do
+            sleep 300
+          done
