@@ -6,22 +6,22 @@ on:
 jobs:
   debug:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # حداکثر 6 ساعت (بیشتر از این GitHub اجازه نمی‌دهد)
+    timeout-minutes: 360
 
     steps:
-      - name: Update system (optional but useful)
-        run: |
-          sudo apt update
-          sudo apt install -y curl
-
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         with:
-          limit-access-to-actor: true
+          limit-access-to-actor: false
+          detached: true
+
+      - name: Print tmate web url
+        run: |
+          echo "Web shell:"
+          curl -s http://localhost:4040/api/tunnels || true
 
       - name: Keep runner alive
         run: |
-          echo "Runner is alive. Sleeping..."
           while true; do
             sleep 300
           done
