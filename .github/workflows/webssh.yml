@@ -1,0 +1,28 @@
+name: Web Terminal Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  web-terminal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+      - name: Install tools
+        run: |
+          sudo apt update
+          sudo apt install -y ttyd curl openssh-client
+
+      - name: Start web terminal
+        run: |
+          echo "Starting ttyd on port 7681"
+          ttyd -p 7681 -W bash &
+
+      - name: Create HTTPS tunnel via Pinggy
+        run: |
+          ssh -p 443 \
+          -o StrictHostKeyChecking=no \
+          -o ServerAliveInterval=30 \
+          -R0:localhost:7681 \
+          a.pinggy.io
