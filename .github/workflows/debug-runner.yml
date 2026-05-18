@@ -13,15 +13,10 @@ jobs:
         uses: mxschmitt/action-tmate@v3
         with:
           limit-access-to-actor: false
-          detached: true
-
-      - name: Print tmate web url
-        run: |
-          echo "Web shell:"
-          curl -s http://localhost:4040/api/tunnels || true
 
       - name: Keep runner alive
         run: |
+          echo "Runner is alive..."
           while true; do
             sleep 300
           done
