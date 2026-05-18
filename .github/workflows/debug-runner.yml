@@ -1,4 +1,4 @@
-name: Persistent Debug Runner
+name: Web Terminal no-SSH
 
 on:
   workflow_dispatch:
@@ -9,14 +9,24 @@ jobs:
     timeout-minutes: 360
 
     steps:
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: false
-
-      - name: Keep runner alive
+      - name: Install Web Terminal (shellinabox)
         run: |
-          echo "Runner is alive..."
-          while true; do
-            sleep 300
-          done
+          sudo apt update
+          sudo apt install -y shellinabox
+          sudo sed -i 's/4200/8080/' /etc/default/shellinabox
+          sudo systemctl restart shellinabox
+
+      - name: Get runner IP
+        id: ip
+        run: |
+          IP=$(curl -s ifconfig.me || curl -s https://api.ipify.org)
+          echo "runner_ip=$IP" >> $GITHUB_OUTPUT
+
+      - name: Show access URL
+        run: |
+          echo "Open this in your browser:"
+          echo "https://${{ steps.ip.outputs.runner_ip }}:8080"
+
+      - name: Keep alive
+        run: |
+          while true; do sleep 300; done
