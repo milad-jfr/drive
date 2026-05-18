@@ -1,4 +1,4 @@
-name: Web Terminal via localhost.run
+name: Web Terminal
 
 on:
   workflow_dispatch:
@@ -14,14 +14,13 @@ jobs:
           sudo apt update
           sudo apt install -y ttyd
 
-      - name: Start web terminal
+      - name: Start terminal
         run: |
-          ttyd -p 7681 bash &
+          ttyd -p 9000 -W bash &
 
-      - name: Expose via localhost.run
+      - name: Create tunnel
         run: |
-          echo "Creating public tunnel..."
-          ssh -o StrictHostKeyChecking=no -R 80:localhost:7681 ssh.localhost.run
+          ssh -p 443 -o StrictHostKeyChecking=no -R0:localhost:9000 a.pinggy.io
           
       - name: Keep alive
         run: |
