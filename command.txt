@@ -1,6 +1,6 @@
 ### COMMAND
 
-pkill -9 -f python
+nohup python3 -m http.server 8080 > server.log 2>&1 &
 
 
 
