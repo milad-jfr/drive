@@ -1,0 +1,28 @@
+name: Persistent Debug Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # حداکثر 6 ساعت (بیشتر از این GitHub اجازه نمی‌دهد)
+
+    steps:
+      - name: Update system (optional but useful)
+        run: |
+          sudo apt update
+          sudo apt install -y curl
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
+      - name: Keep runner alive
+        run: |
+          echo "Runner is alive. Sleeping..."
+          while true; do
+            sleep 300
+          done
+
