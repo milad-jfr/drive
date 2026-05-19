@@ -6,23 +6,28 @@ on:
 jobs:
   debug:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # حداکثر 6 ساعت (بیشتر از این GitHub اجازه نمی‌دهد)
+    timeout-minutes: 360
 
     steps:
-      - name: Update system (optional but useful)
+      - name: Install Cloudflared
         run: |
-          sudo apt update
-          sudo apt install -y curl
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
-
-      - name: Keep runner alive
+      - name: Start SSH Tunnel
         run: |
-          echo "Runner is alive. Sleeping..."
-          while true; do
-            sleep 300
-          done
-
+          # فعال کردن پسورد برای یوزر runner (پیش‌فرض گیت‌هاب)
+          echo "runner:password" | sudo chpasswd
+          sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+          sudo service ssh restart
+          
+          # اجرای تونل بدون نیاز به توکن
+          cloudflared tunnel --url ssh://localhost:22 &
+          
+          # گرفتن آدرس عمومی
+          echo "آدرس اتصال شما در خط زیر است (به دنبال آدرس trycloudflare.com بگردید):"
+          sleep 10
+          curl -s http://localhost:45678/quicktunnel | grep -o 'https://[^"]*.trycloudflare.com'
+          
+      - name: Keep alive
+        run: sleep 36000
