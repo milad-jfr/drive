@@ -1,6 +1,7 @@
 ### COMMAND
 
-"$HOME/.local/bin/skirk" setup init --out skirk-kit --reset-google-login
+curl ifconfig.me
+
 
 
 ### END
