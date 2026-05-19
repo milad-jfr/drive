@@ -1,6 +1,7 @@
 ### COMMAND
+ping -c 4 141.11.45.67
 
-netstat -tulpn | grep 8080
+nc -zv 141.11.45.67 9011
 
 
 
